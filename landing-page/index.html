@@ -1,0 +1,1448 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DataOrbyt — Know what’s moving your business.</title>
+<meta name="description" content="DataOrbyt gives founders and small teams useful business dashboards without the usual setup. Ask Claude for the metrics you need, preview a dashboard built from approved metrics, then open and share it in DataOrbyt." />
+<meta property="og:title" content="DataOrbyt — Know what’s moving your business." />
+<meta property="og:description" content="Dashboards for founders and small teams, built from approved business metrics. Ask in Claude, explore and share in DataOrbyt." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DataOrbyt" />
+<!-- When served by the app at /landing-page this relative URL is made absolute. -->
+<meta property="og:image" content="/landing-page/opengraph-image" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#f6f4ef" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18.1 20.1A24 24 0 0 1 50 22.7V7h8v27a26 26 0 0 1-20 25.3v-8.2A18 18 0 0 0 47.4 26a16 16 0 0 0-23.5-.7Z' fill='%23101116'/%3E%3Cpath d='M12.7 29.2a24 24 0 0 0 17.8 30.5v-8.3a16 16 0 0 1-10.2-19.6Z' fill='%23101116'/%3E%3Ccircle cx='17' cy='25' r='6' fill='%231515f5'/%3E%3Ccircle cx='34' cy='36' r='10' fill='%23101116'/%3E%3C/svg%3E" />
+<!-- Optional web font. Without network access the page falls back to the system UI font. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f6f4ef; --bg-deep: #efece4; --surface: #fff; --line: #e6e1d6; --line-cool: #e3e6eb;
+    --ink: #0e1626; --ink-2: #384252; --muted: #5c6371; --faint: #6b7280;
+    --accent: #4b46e0; --accent-hover: #3d38c4; --accent-soft: #eceafd; --accent-light: #a9a6ff;
+    --blue: #2a78d6; --orange: #eb6834; --ok: #0b6644; --ok-dot: #0f7a52;
+    --chat: #faf8f3; --chat-line: #e8e3d7;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3, h4, p, ul, ol, dl, dd, figure { margin: 0; }
+  ul, ol { padding: 0; list-style: none; }
+  svg { display: block; }
+  button { font: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+  .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip { position: absolute; left: 8px; top: -60px; background: #fff; padding: 8px 12px; border-radius: 8px; z-index: 100; }
+  .skip:focus { top: 8px; }
+  .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
+  @media (min-width: 640px) { .wrap { padding-left: 32px; padding-right: 32px; } }
+  [id] { scroll-margin-top: 72px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 10px; font: 600 14.5px var(--sans); cursor: pointer; border: 0; transition: background .15s, border-color .15s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 1px 2px rgb(14 22 38 / .2); }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: rgb(255 255 255 / .75); color: var(--ink); border: 1px solid #d9d4c8; }
+  .btn-secondary:hover { background: #fff; }
+  .btn-light { background: #fff; color: var(--ink); }
+  .btn-light:hover { background: var(--accent-soft); }
+  .btn-sm { height: 36px; padding: 0 14px; font-size: 13.5px; }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* Tags */
+  .tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 8px; border-radius: 999px; border: 1px solid; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .tag-demo { border-color: #efd9ae; background: #fdf3e2; color: #8a4b05; }
+  .tag-preview { border-color: #c4e6d5; background: #e7f5ee; color: var(--ok); }
+  .tag-planned { border-color: #d6dae2; background: #f1f3f6; color: #4a5262; }
+  .tag-principle { border-color: #d4d1fb; background: var(--accent-soft); color: #3b36b8; }
+  .tag-surface-claude { border-color: #e2d7c3; background: #f6efe2; color: #6b4e1f; }
+  .tag-surface-app { border-color: #d4d1fb; background: var(--accent-soft); color: #3b36b8; }
+
+  /* Brand */
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 400; letter-spacing: -.045em; color: #101116; }
+  .brand b { color: inherit; font-weight: 700; }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 40; background: var(--bg); border-bottom: 1px solid transparent; transition: border-color .2s, background .2s; }
+  .nav.scrolled, .nav.open { background: rgb(246 244 239 / .92); backdrop-filter: blur(10px); border-color: var(--line); }
+  .nav-inner { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .nav-links { display: none; gap: 2px; }
+  .nav-links a, .nav-aux a.link { padding: 8px 11px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+  .nav-links a:hover, .nav-aux a.link:hover { color: var(--ink); }
+  .nav-aux { margin-left: auto; display: none; align-items: center; gap: 6px; }
+  .menu-btn { margin-left: auto; width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .menu-btn:hover { background: rgb(0 0 0 / .05); }
+  .mobile-menu { border-top: 1px solid var(--line); padding: 8px 20px 20px; }
+  .mobile-menu[hidden] { display: none; }
+  .mobile-menu a.item { display: block; padding: 12px 8px; border-radius: 8px; font-size: 16px; font-weight: 500; }
+  .mobile-menu a.item:hover { background: rgb(0 0 0 / .05); }
+  .mobile-menu .btn { width: 100%; margin-top: 12px; }
+  @media (min-width: 900px) { .nav-links, .nav-aux { display: flex; } .menu-btn, .mobile-menu { display: none !important; } }
+
+  /* Section type */
+  .eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .eyebrow::before { content: ""; width: 20px; height: 1px; background: currentColor; }
+  .h2 { font-size: 30px; line-height: 1.12; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+  .intro { margin-top: 16px; font-size: 16.5px; line-height: 1.65; color: var(--muted); text-wrap: pretty; }
+  .intro b { color: var(--ink-2); font-weight: 600; }
+  .dark .intro b { color: #fff; }
+  @media (min-width: 640px) { .h2 { font-size: 38px; } }
+  .section { padding: 80px 0; }
+  @media (min-width: 640px) { .section { padding: 104px 0; } }
+  .band { background: rgb(239 236 228 / .6); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .head { max-width: 700px; }
+  .head.center { margin: 0 auto; text-align: center; }
+  .head.center .eyebrow { justify-content: center; }
+  .status { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+  .status svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; color: #8a4b05; }
+
+  /* Hero */
+  /* Same structure as the first page: centered copy, then a wider product frame */
+  .hero { display: grid; justify-items: center; gap: 40px; grid-template-columns: minmax(0, 1fr); padding-top: 56px; padding-bottom: 64px; text-align: center; }
+  @media (min-width: 640px) { .hero { gap: 48px; padding-top: 72px; padding-bottom: 80px; } }
+  .hero-text { width: 100%; max-width: 900px; margin: 0 auto; text-align: center; }
+  .who { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 8px; padding: 4px 12px 4px 6px; border-radius: 18px; border: 1px solid #e2ddd1; background: rgb(255 255 255 / .7); font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-bottom: 20px; }
+  .who b { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .02em; }
+  .hero h1 { max-width: 14em; margin: 0 auto; font-size: 38px; line-height: 1.05; font-weight: 600; letter-spacing: -.035em; text-wrap: balance; }
+  @media (min-width: 640px) { .hero h1 { font-size: 58px; } }
+  .hero .lede { margin: 20px auto 0; font-size: 17px; line-height: 1.65; color: var(--ink-2); text-wrap: pretty; max-width: 760px; }
+  @media (min-width: 640px) { .hero .lede { font-size: 18px; } }
+  .cta-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; margin-top: 28px; }
+  .qualifier { margin-top: 16px; font-size: 13.5px; color: var(--muted); }
+  #top { position: relative; overflow-x: clip; }
+  .hero { position: relative; z-index: 1; }
+  .hero-grid { position: absolute; inset: 0 0 auto; z-index: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-auto-rows: 92px; height: 640px; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 78%); mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 78%); }
+  .hero-grid span { border-right: 1px solid rgb(14 22 38 / .05); border-bottom: 1px solid rgb(14 22 38 / .05); }
+  .hero-grid span:nth-child(8n + 1) { border-left: 1px solid rgb(14 22 38 / .05); }
+  .hero-grid span:nth-child(-n + 8) { border-top: 1px solid rgb(14 22 38 / .05); }
+  .hero-grid span:nth-child(6),
+  .hero-grid span:nth-child(19),
+  .hero-grid span:nth-child(36) { background: rgb(75 70 224 / .055); }
+  .hero-grid span:nth-child(14),
+  .hero-grid span:nth-child(29),
+  .hero-grid span:nth-child(47) { background: rgb(42 120 214 / .05); }
+  @media (max-width: 720px) { .hero-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 72px; height: 520px; } .hero-grid span:nth-child(8n + 1) { border-left: 0; } .hero-grid span:nth-child(4n + 1) { border-left: 1px solid rgb(14 22 38 / .05); } .hero-grid span:nth-child(-n + 8) { border-top: 0; } .hero-grid span:nth-child(-n + 4) { border-top: 1px solid rgb(14 22 38 / .05); } }
+  .hero-visual { position: relative; min-width: 0; width: min(100%, 1040px); margin: 0 auto; }
+  .dots { position: absolute; inset: 8px -12px -8px; background-image: radial-gradient(circle at 1px 1px, rgb(14 22 38 / .09) 1px, transparent 0); background-size: 22px 22px; -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 72%, transparent); mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 72%, transparent); pointer-events: none; }
+  .visual-note { position: relative; max-width: 720px; margin: 14px auto 0; text-align: center; font-size: 12px; line-height: 1.5; color: var(--muted); }
+  .visual-note b { color: var(--ink-2); font-weight: 600; }
+
+  /* Capabilities */
+  .caps { margin-top: 44px; display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 720px) { .caps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1080px) { .caps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .cap { display: grid; grid-template-rows: auto 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fff; transition: border-color .2s, box-shadow .2s, transform .2s; }
+  .cap:hover { border-color: #d4d1fb; box-shadow: 0 18px 40px -28px rgb(14 22 38 / .35); transform: translateY(-2px); }
+  .cap-art { height: 160px; border-bottom: 1px solid #efece5; background: linear-gradient(180deg, #fbfaf7, #f4f2ec); }
+  .cap-art svg { display: block; width: 100%; height: 100%; }
+  .cap-body { display: grid; gap: 9px; align-content: start; padding: 20px 20px 22px; }
+  .cap-k { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .cap-k small { font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--accent); }
+  .cap-no { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: #a2a7b0; }
+  .cap h3 { max-width: 15em; font-size: 21px; line-height: 1.22; font-weight: 600; letter-spacing: -.025em; }
+  .cap p { min-height: 45px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+  .cap ul { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; padding-top: 14px; border-top: 1px solid #eef0f3; }
+  .cap li { border: 1px solid #e4e6eb; border-radius: 999px; background: #fafbfc; padding: 5px 9px; font-size: 11.5px; line-height: 1.2; font-weight: 600; color: #596170; }
+  .cap-art .pulse, .gap-art .pulse, .shift-art .pulse { animation: capPulse 2.4s ease-in-out infinite; transform-origin: center; transform-box: fill-box; }
+  @keyframes capPulse { 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .cap, .cap:hover { transform: none; transition: none; } .cap-art .pulse, .gap-art .pulse, .shift-art .pulse { animation: none; } }
+
+  /* Claude-style conversation mockup (illustrative) */
+  .chat { position: relative; overflow: hidden; border-radius: 16px; border: 1px solid var(--chat-line); background: var(--chat); box-shadow: 0 1px 2px rgb(14 22 38 / .05), 0 28px 56px -28px rgb(14 22 38 / .28); text-align: left; }
+  .chat-top { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-bottom: 1px solid var(--chat-line); font-size: 12.5px; font-weight: 600; color: #3d3a33; }
+  .chat-top .ava { width: 20px; height: 20px; border-radius: 6px; background: #d9c7a7; display: flex; align-items: center; justify-content: center; color: #5a4520; }
+  .chat-top .ava svg { width: 12px; height: 12px; }
+  .chat-top .tags { margin-left: auto; display: flex; gap: 6px; }
+  .chat-body { display: grid; gap: 12px; padding: 16px; }
+  @media (min-width: 640px) { .chat-body { padding: 18px 20px 20px; } }
+  .u-msg { justify-self: end; max-width: min(88%, 520px); border-radius: 14px 14px 4px 14px; background: #efe9dc; padding: 9px 13px; font-size: 14px; line-height: 1.5; color: #2a2723; text-align: left; }
+  .tool { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; justify-self: start; border: 1px solid var(--chat-line); background: #fff; border-radius: 8px; padding: 5px 9px; font-size: 11.5px; color: #4a463e; }
+  .tool svg { width: 13px; height: 13px; color: var(--ok-dot); }
+  .tool .src { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--ink); }
+  .tool .src svg { width: 13px; height: 13px; color: #101116; }
+  .a-msg { font-size: 14px; line-height: 1.55; color: #2a2723; }
+  .dash-card { border: 1px solid var(--line-cool); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 2px rgb(14 22 38 / .05); }
+  .dash-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 10px 12px; border-bottom: 1px solid #eef0f3; }
+  .dash-head .t { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+  .dash-head .t svg { width: 14px; height: 14px; color: #101116; }
+  .dash-head .tags { margin-left: auto; display: flex; gap: 6px; }
+  .dash-body { padding: 12px 14px 14px; display: grid; gap: 12px; }
+  .kpi3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+  .kpi { border: 1px solid #eef0f3; border-radius: 8px; padding: 7px 8px; min-width: 0; }
+  .kpi .l { font-size: 10.5px; color: var(--muted); line-height: 1.25; }
+  .kpi .v { margin-top: 2px; font-size: 17px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); }
+  .kpi .d { font-size: 10px; color: var(--faint); }
+  .kpi .d b { color: var(--ok); font-weight: 500; }
+  .chart-box { border: 1px solid #eef0f3; border-radius: 8px; padding: 8px 10px 6px; }
+  .chart-box .ct { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; font-size: 10.5px; color: var(--muted); }
+  .chart-box .ct b { color: var(--ink); font-weight: 600; }
+  .bars { display: flex; align-items: flex-end; gap: 10px; height: 96px; margin-top: 20px; border-bottom: 1px solid #cfd4dc; }
+  .bars span { flex: 1; border-radius: 4px 4px 0 0; background: var(--blue); position: relative; }
+  .bars span::after { content: attr(data-v); position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 9.5px; color: var(--muted); white-space: nowrap; }
+  .bar-x { display: flex; gap: 6px; margin-top: 4px; }
+  .bar-x span { flex: 1; text-align: center; font-size: 9.5px; color: var(--faint); }
+  .dash-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-top: 1px solid #eef0f3; background: #fbfbfc; }
+  .dash-foot small { font-size: 11px; color: var(--faint); }
+  .open-btn { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 12.5px; font-weight: 600; }
+  a.open-btn:hover { background: #222b3d; }
+  .open-btn svg { width: 13px; height: 13px; }
+  .chat-input { display: flex; align-items: center; gap: 8px; margin: 0 16px 16px; border: 1px solid var(--chat-line); background: #fff; border-radius: 12px; padding: 10px 12px; font-size: 13px; color: #8a8478; }
+  .chat-input .send { margin-left: auto; width: 26px; height: 26px; border-radius: 8px; background: #d9c7a7; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .chat-input .send svg { width: 14px; height: 14px; }
+
+  /* Walkthrough (motion-graphics sequence) */
+  .story { position: relative; margin-top: 0; text-align: left; }
+  .scenes { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .story:not(.is-player) .scenes { grid-template-columns: repeat(2, minmax(0, 1fr)); } .story:not(.is-player) .scene:last-child { grid-column: 1 / -1; } }
+  .scene { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 16px; display: grid; gap: 14px; align-content: start; }
+  @media (min-width: 640px) { .scene { padding: 20px; } }
+  .scene-text { display: grid; gap: 10px; align-content: start; }
+  .scene-label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .scene-label .n { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; }
+  .scene-label h3 { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .scene figcaption { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+  .scene-visual { position: relative; border-radius: 12px; background: var(--bg); border: 1px solid #ece8de; padding: 14px; min-height: 230px; display: flex; flex-direction: column; justify-content: center; gap: 10px; overflow: hidden; }
+  /* Player mode (JS on, motion allowed): one scene at a time on a fixed-size stage */
+  .story.is-player .scenes { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .story.is-player .scene { grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .45s ease, transform .45s ease, visibility 0s linear .45s; }
+  .story.is-player .scene.active { opacity: 1; visibility: visible; transform: none; transition: opacity .45s ease, transform .45s ease; }
+  .story.is-player .scene-visual { min-height: 300px; }
+  @media (min-width: 900px) {
+    .story.is-player .scene { grid-template-columns: 1fr 1.35fr; align-items: center; gap: 32px; padding: 28px; }
+    .story.is-player .scene-visual { min-height: 340px; }
+    .story.is-player .scene figcaption { font-size: 16px; }
+    .story.is-player .scene-label h3 { font-size: 20px; }
+  }
+  .surface-key { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 18px; font-size: 13px; color: var(--ink-2); }
+  .surface-key span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Scene internals */
+  .typing { min-height: 1.5em; }
+  .caret { display: inline-block; flex-shrink: 0; width: 2px; height: 1.05em; margin-left: -6px; background: #2a2723; animation: blink 1s steps(1) infinite; }
+  .mini-input { display: flex; align-items: center; gap: 8px; border: 1px solid var(--chat-line); background: #fff; border-radius: 12px; padding: 12px; font-size: 14px; color: #2a2723; box-shadow: 0 6px 18px -12px rgb(14 22 38 / .25); }
+  .mini-input .send { margin-left: auto; flex-shrink: 0; width: 28px; height: 28px; border-radius: 8px; background: #c9b48e; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .mini-input .send svg { width: 14px; height: 14px; }
+  .mini-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--muted); }
+  .mini-title svg { width: 14px; height: 14px; }
+  .metric-list { display: grid; gap: 8px; }
+  .metric-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-cool); background: #fff; border-radius: 10px; padding: 10px 12px; }
+  .metric-row .ic { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); flex-shrink: 0; }
+  .metric-row .ic svg { width: 14px; height: 14px; }
+  .metric-row b { display: block; font-size: 13.5px; font-weight: 600; }
+  .metric-row small { display: block; font-size: 11.5px; color: var(--muted); }
+  .metric-row .ok { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--ok); white-space: nowrap; }
+  .metric-row .ok svg { width: 14px; height: 14px; }
+  .story.is-player .scene .reveal { opacity: 0; transform: translateY(6px); }
+  .story.is-player .scene.active .reveal { animation: rise .5s ease forwards; animation-delay: calc(var(--i, 0) * 450ms + 250ms); }
+  .app-frame { border: 1px solid var(--line-cool); background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 12px 28px -18px rgb(14 22 38 / .35); }
+  .app-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 10px; border-bottom: 1px solid #eef0f3; background: #fbfbfc; font-size: 11.5px; font-weight: 600; color: var(--ink); }
+  .app-bar .brand { font-size: 13px; gap: 6px; }
+  .app-bar .sep { color: #c9cdd4; font-weight: 400; }
+  .app-bar .tag { margin-left: auto; }
+  .app-content { padding: 10px; display: grid; gap: 8px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; }
+  .filter { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--line-cool); font-size: 11px; font-weight: 500; color: var(--ink-2); background: #fff; }
+  .filter svg { width: 11px; height: 11px; color: var(--faint); }
+  .filter.on { border-color: #c9ccfb; background: #f4f3ff; color: #3b36b8; }
+  .defn-pop { display: flex; gap: 6px; align-items: flex-start; border: 1px solid #c9ccfb; background: #f4f3ff; border-radius: 8px; padding: 7px 9px; font-size: 11px; line-height: 1.45; color: #2f2c8f; }
+  .defn-pop svg { width: 12px; height: 12px; flex-shrink: 0; margin-top: 1px; }
+  .fresh { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-2); }
+  .fresh svg { width: 12px; height: 12px; color: var(--ok-dot); }
+  .fresh .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok-dot); margin-left: auto; }
+  .share-modal { border: 1px solid var(--line-cool); background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 16px 36px -20px rgb(14 22 38 / .45); display: grid; gap: 8px; }
+  .share-modal h4 { font-size: 13px; font-weight: 600; }
+  .opt { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-cool); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--ink-2); }
+  .opt .radio { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #b9bfca; flex-shrink: 0; }
+  .opt.on { border-color: #c9ccfb; background: #f4f3ff; color: var(--ink); }
+  .opt.on .radio { border: 4px solid var(--accent); }
+  .opt .tag { margin-left: auto; }
+  .share-row { display: flex; align-items: center; gap: 8px; }
+  .fake-link { flex: 1; min-width: 0; height: 30px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; background: #f6f7f9; border: 1px dashed #cfd4dc; font: 11px var(--mono); color: var(--faint); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .copy-btn { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+  .copy-btn svg { width: 12px; height: 12px; }
+  .toast { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line-cool); background: #fff; border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink-2); box-shadow: 0 10px 24px -16px rgb(14 22 38 / .4); }
+  .toast .av { width: 24px; height: 24px; border-radius: 50%; background: #e4e6fb; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .toast small { display: block; color: var(--faint); font-size: 11px; }
+
+  /* Problem, then the answer */
+  .gaps { margin-top: 48px; display: grid; gap: 16px; }
+  @media (min-width: 900px) { .gaps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .gap { display: grid; align-content: start; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+  .gap-art, .shift-art { background: linear-gradient(180deg, #fbfaf7, #f4f2ec); }
+  .gap-art { height: 156px; border-bottom: 1px solid #efece5; }
+  .gap-art svg, .shift-art svg { display: block; width: 100%; height: 100%; }
+  .gap .body { display: grid; gap: 10px; padding: 18px 20px 22px; }
+  .gap .n { font: 500 13px var(--mono); letter-spacing: .06em; color: var(--accent); }
+  .gap h3 { max-width: 12em; font-size: 24px; line-height: 1.18; font-weight: 600; letter-spacing: -.03em; text-wrap: balance; }
+  .gap p { font-size: 15px; line-height: 1.6; color: var(--muted); }
+  .answer { border-top: 1px solid var(--line); }
+  .shifts { margin-top: 48px; }
+  .shift { display: grid; gap: 16px; grid-template-areas: "art" "from" "to"; padding: 28px 0; border-top: 1px solid #e7e2d8; }
+  .shift:last-child { border-bottom: 1px solid #e7e2d8; }
+  .shift .from { grid-area: from; }
+  .shift-art { grid-area: art; height: 132px; border: 1px solid #efece5; border-radius: 16px; overflow: hidden; }
+  .shift .to { grid-area: to; }
+  @media (min-width: 860px) { .shift { grid-template-columns: minmax(190px, .68fr) 230px minmax(0, 1.15fr); grid-template-areas: "from art to"; gap: 36px; align-items: center; padding: 34px 0; } }
+  .shift .from { font-size: 22px; line-height: 1.25; font-weight: 500; letter-spacing: -.025em; color: #8d8578; text-wrap: balance; }
+  .shift .from b { display: block; margin-bottom: 10px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #b3aa9c; }
+  .shift h3 { font-size: 28px; line-height: 1.15; font-weight: 600; letter-spacing: -.03em; text-wrap: balance; }
+  @media (min-width: 640px) { .shift h3 { font-size: 32px; } }
+  .shift p { margin-top: 10px; max-width: 40em; font-size: 16.5px; line-height: 1.65; color: var(--ink-2); }
+
+  /* Three steps */
+  .steps3 { margin-top: 48px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .steps3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .s3 { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 20px; display: grid; gap: 12px; align-content: start; }
+  .s3-visual { height: 132px; border-radius: 12px; background: var(--bg); border: 1px solid #ece8de; padding: 12px; display: flex; flex-direction: column; justify-content: center; gap: 8px; overflow: hidden; }
+  .s3 .k { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+  .s3 h3 { font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+  .s3 p { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .s3 .status { margin-top: 0; font-size: 12.5px; color: var(--muted); }
+  .src-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .src-chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line-cool); background: #fff; font-size: 12px; font-weight: 500; color: var(--ink-2); }
+  .src-chip svg { width: 13px; height: 13px; color: var(--accent); }
+  .src-chip.on { border-color: #c4e6d5; }
+  .src-chip.on svg { color: var(--ok-dot); }
+
+  /* Questions */
+  .qgrid { margin-top: 44px; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 640px) { .qgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .qgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .q { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 18px; display: grid; gap: 12px; align-content: space-between; }
+  .q h3 { font-size: 16px; line-height: 1.4; font-weight: 600; letter-spacing: -.01em; }
+  .q .view { display: flex; align-items: center; gap: 8px; border-top: 1px dashed var(--line); padding-top: 12px; font-size: 12.5px; color: var(--muted); }
+  .q .view svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+  .fine { margin-top: 20px; font-size: 13.5px; line-height: 1.6; color: var(--muted); max-width: 760px; }
+
+  /* Time comparison */
+  .compare { margin-top: 40px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .compare { grid-template-columns: 1fr 1fr; } }
+  .path { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 20px; }
+  .path.ours { border-color: #c9ccfb; box-shadow: 0 0 0 3px rgb(75 70 224 / .06); }
+  .path h3 { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
+  .path ol { margin-top: 14px; display: grid; gap: 8px; counter-reset: p; }
+  .path li { counter-increment: p; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); padding: 9px 12px; border-radius: 10px; background: #f8f7f3; }
+  .path li::before { content: counter(p); display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%; background: #e6e1d6; color: var(--ink-2); font-size: 11.5px; font-weight: 700; }
+  .path.ours li { background: #f5f4ff; }
+  .path.ours li::before { background: var(--accent); color: #fff; }
+  .path small { display: block; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+
+  /* Two surfaces */
+  .surfaces { margin-top: 44px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  @media (min-width: 900px) { .surfaces { grid-template-columns: 1fr auto 1fr; } }
+  .surface { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 20px; display: grid; gap: 16px; align-content: start; }
+  .surface h3 { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 600; letter-spacing: -.015em; }
+  .checks { display: grid; gap: 10px; }
+  .checks li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 15px; color: var(--ink-2); }
+  .checks li > svg { width: 16px; height: 16px; flex-shrink: 0; color: var(--accent); }
+  .handoff { display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .handoff .h { display: none; }
+  @media (min-width: 900px) { .handoff .h { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--muted); } .handoff .v { display: none; } }
+  .handoff svg { width: 22px; height: 22px; }
+  .badge-ico { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+  .badge-ico svg { width: 16px; height: 16px; }
+  .badge-ico.claude { background: #f2eadb; color: #6b4e1f; }
+  .badge-ico.brandmark { background: #fff; border: 1px solid var(--line); color: #101116; }
+  .badge-ico.brandmark svg { width: 20px; height: 20px; }
+
+  /* Lineage */
+  .lineage { margin-top: 36px; display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+  @media (min-width: 900px) { .lineage { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; } }
+  .node { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 16px; }
+  .node.hl { border-color: #c9ccfb; background: #f7f6ff; }
+  .node small { display: block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .node b { display: block; margin-top: 6px; font-size: 16px; font-weight: 600; }
+  .node .ex { margin-top: 6px; font: 12px var(--mono); color: var(--ink-2); }
+  .node .badge-ico { margin-bottom: 10px; }
+  .arrow { display: flex; align-items: center; justify-content: center; padding: 8px 0; color: #8d8af5; }
+  .arrow .h { display: none; }
+  @media (min-width: 900px) { .arrow { padding: 0 6px; } .arrow .h { display: block; } .arrow .v { display: none; } }
+  .flowline { stroke-dasharray: 4 6; animation: flow 1.4s linear infinite; }
+  .dbt-note { margin-top: 20px; border-left: 2px solid #d9d4c8; padding-left: 12px; font-size: 14px; line-height: 1.6; color: var(--muted); max-width: 820px; }
+  .dbt-note b { color: var(--ink-2); }
+
+  /* Supporting features */
+  .support { margin-top: 40px; display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .support { grid-template-columns: 1fr 1fr; } }
+  .feat { border: 1px solid var(--line); background: #fff; border-radius: 16px; padding: 20px; display: grid; gap: 14px; align-content: start; }
+  .feat h3 { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+  .feat > p { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .feat .status { margin-top: 0; }
+  .mock { border: 1px solid var(--line-cool); border-radius: 12px; padding: 12px; background: #fbfbfc; }
+  .alert-head { display: flex; align-items: center; gap: 8px; }
+  .alert-ico { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px; background: #fdecea; color: #b42318; flex-shrink: 0; }
+  .alert-ico svg { width: 15px; height: 15px; }
+  .alert-head small { display: block; font-size: 11px; color: var(--faint); }
+  .alert-head b { display: block; font-size: 13.5px; }
+  .types { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .types li { font-size: 12px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); background: #fff; color: var(--ink-2); }
+  table.exp { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.exp th, table.exp td { padding: 7px 0; text-align: right; border-bottom: 1px solid #eef0f3; }
+  table.exp thead th { font-size: 10.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); }
+  table.exp th:first-child { text-align: left; }
+  table.exp tbody th { font-weight: 500; }
+  table.exp tbody tr:last-child th, table.exp tbody tr:last-child td { border: 0; }
+  .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .note-box { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; font-size: 11.5px; line-height: 1.5; color: var(--ink-2); }
+  .note-box svg { width: 13px; height: 13px; flex-shrink: 0; margin-top: 2px; color: var(--accent); }
+
+  /* How Claude fits in (dark) */
+  .dark { background: var(--ink); color: #fff; }
+  .dark .eyebrow { color: var(--accent-light); }
+  .dark .intro { color: #c3c8d4; }
+  .fit { display: grid; gap: 48px; align-items: center; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .fit { grid-template-columns: 1fr 1fr; gap: 64px; } }
+  .dark-points { margin-top: 28px; display: grid; gap: 12px; }
+  .dark-points li { display: flex; gap: 10px; font-size: 15px; line-height: 1.55; color: #d5dae5; }
+  .dark-points li svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 3px; color: var(--accent-light); }
+  .dark-points b { color: #fff; }
+  .fit-cta { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .fit-cta small { font-size: 12.5px; color: #9aa3b8; max-width: 340px; }
+  .diagram { border: 1px solid rgb(255 255 255 / .1); background: #141c31; border-radius: 16px; padding: 20px; display: grid; gap: 10px; }
+  .dg-box { border: 1px solid rgb(255 255 255 / .12); background: rgb(255 255 255 / .04); border-radius: 12px; padding: 14px; }
+  .dg-box h4 { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .dg-box h4 svg { width: 16px; height: 16px; }
+  .dg-box p { margin-top: 6px; font-size: 13px; line-height: 1.5; color: #b6bdcc; }
+  .dg-box ul { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .dg-box li { font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: rgb(255 255 255 / .08); color: #d5dae5; }
+  .dg-box.main { border-color: rgb(169 166 255 / .45); background: rgb(75 70 224 / .12); }
+  .dg-link { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11.5px; color: #9aa6c2; }
+  .dg-link svg { width: 16px; height: 16px; color: var(--accent-light); }
+  .dg-link span { font: 11px var(--mono); padding: 2px 8px; border-radius: 999px; border: 1px solid rgb(255 255 255 / .15); }
+
+  /* Cards (governance / privacy) */
+  .cards { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); margin-top: 40px; }
+  @media (min-width: 640px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .cards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .tile { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 18px; }
+  .tile-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tile-top svg { width: 20px; height: 20px; color: var(--accent); }
+  .tile h3 { margin-top: 12px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .tile p { margin-top: 6px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+  .privacy-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .privacy-grid { grid-template-columns: 1fr 1.4fr; gap: 64px; } }
+  .privacy-grid .cards { margin-top: 0; }
+
+  /* Final CTA */
+  .cta-shell { padding: 0 12px 12px; }
+  @media (min-width: 640px) { .cta-shell { padding: 0 20px 20px; } }
+  .cta { position: relative; overflow: hidden; border-radius: 18px; background: var(--ink); padding: 64px 20px; }
+  @media (min-width: 640px) { .cta { padding: 88px 32px; } }
+  .cta .orbits { position: absolute; right: -160px; bottom: -192px; width: 1040px; height: 520px; opacity: .4; pointer-events: none; }
+  .cta-inner { position: relative; max-width: 680px; margin: 0 auto; text-align: center; }
+  .cta h2 { font-size: 30px; line-height: 1.1; font-weight: 600; letter-spacing: -.03em; color: #fff; text-wrap: balance; }
+  @media (min-width: 640px) { .cta h2 { font-size: 42px; } }
+  .cta-inner > p { max-width: 560px; margin: 16px auto 0; font-size: 16.5px; line-height: 1.65; color: #c3c8d4; }
+  .form-wrap { max-width: 576px; margin: 32px auto 0; text-align: left; }
+  .form-row { display: flex; flex-direction: column; gap: 8px; }
+  @media (min-width: 640px) { .form-row { flex-direction: row; } }
+  .form-row input, .form-row select { height: 44px; border-radius: 10px; border: 1px solid transparent; background: #fff; padding: 0 14px; font: 15px var(--sans); color: var(--ink); }
+  .form-row input { flex: 1; min-width: 0; }
+  .form-row select { font-size: 14px; }
+  @media (min-width: 640px) { .form-row select { width: 160px; } }
+  .form-row input:focus, .form-row select:focus { outline: none; box-shadow: 0 0 0 3px rgb(169 166 255 / .5); }
+  .form-row input[aria-invalid="true"] { border-color: #f19a8f; }
+  .form-row input:disabled, .form-row select:disabled { opacity: .6; }
+  .btn-submit { background: #6c67f0; color: #fff; }
+  .btn-submit:hover { background: #5b56e6; }
+  .btn-submit:disabled { opacity: .8; cursor: wait; }
+  .form-status { margin-top: 10px; min-height: 20px; font-size: 13px; color: #9aa3b8; }
+  .form-status.err { color: #ffb4aa; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgb(255 255 255 / .35); border-top-color: #fff; animation: spin .8s linear infinite; }
+  .result { border: 1px solid rgb(255 255 255 / .15); background: rgb(255 255 255 / .06); border-radius: 14px; padding: 20px; display: flex; gap: 12px; }
+  .result[hidden] { display: none; }
+  .result > svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--accent-light); margin-top: 2px; }
+  .result b { display: block; font-size: 15px; color: #fff; }
+  .result p { margin-top: 4px; font-size: 14px; line-height: 1.6; color: #c3c8d4; }
+  .result p strong { color: #fff; font-weight: 500; }
+  .result .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .btn-ghost-dark { background: transparent; color: #fff; border: 1px solid rgb(255 255 255 / .2); }
+  .btn-ghost-dark:hover { background: rgb(255 255 255 / .1); }
+
+  /* Footer */
+  .footer { display: flex; flex-direction: column; gap: 32px; padding-top: 48px; padding-bottom: 48px; }
+  @media (min-width: 640px) { .footer { flex-direction: row; justify-content: space-between; align-items: flex-start; } }
+  .footer p { margin-top: 12px; max-width: 320px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+  .footer nav { display: grid; grid-template-columns: repeat(2, auto); gap: 8px 48px; font-size: 13.5px; }
+  .footer nav span { grid-column: span 2; margin-bottom: 4px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .footer nav a { color: var(--ink-2); }
+  .footer nav a:hover { color: var(--ink); text-decoration: underline; }
+  .signoff { display: flex; flex-direction: column; gap: 4px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  @media (min-width: 640px) { .signoff { flex-direction: row; justify-content: space-between; } }
+
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes flow { to { stroke-dashoffset: -20; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* The caret only blinks while the walkthrough is actually playing as a sequence. */
+  .story:not(.is-player) .caret { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .flowline { animation: none; }
+    .spinner { animation-duration: 2.4s; }
+    .caret { display: none; }
+  }
+</style>
+</head>
+<body>
+<!-- Icons (Lucide-style, ISC licence) and the DataOrbyt mark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="mark"><path d="M18.1 20.1A24 24 0 0 1 50 22.7V7h8v27a26 26 0 0 1-20 25.3v-8.2A18 18 0 0 0 47.4 26a16 16 0 0 0-23.5-.7Z" fill="currentColor"/><path d="M12.7 29.2a24 24 0 0 0 17.8 30.5v-8.3a16 16 0 0 1-10.2-19.6Z" fill="currentColor"/><circle cx="17" cy="25" r="6" fill="#1515f5"/><circle cx="34" cy="36" r="10" fill="currentColor"/></g>
+    <g id="i-database" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></g>
+    <g id="i-chart" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></g>
+    <g id="i-users" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+    <g id="i-plug" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></g>
+    <g id="i-code" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></g>
+    <g id="i-sigma" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></g>
+    <g id="i-layout" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></g>
+    <g id="i-gauge" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></g>
+    <g id="i-flask" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.53a2 2 0 0 1-.21.9L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.07-10.12a2 2 0 0 1-.21-.9V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></g>
+    <g id="i-bell" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g>
+    <g id="i-check" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></g>
+    <g id="i-check-circle" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></g>
+    <g id="i-info" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></g>
+    <g id="i-arrow-right" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g>
+    <g id="i-arrow-down" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></g>
+    <g id="i-arrow-up" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></g>
+    <g id="i-external" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></g>
+    <g id="i-calendar" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></g>
+    <g id="i-filter" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></g>
+    <g id="i-link" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></g>
+    <g id="i-clock" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></g>
+    <g id="i-lock" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g>
+    <g id="i-key" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></g>
+    <g id="i-shield" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></g>
+    <g id="i-scroll" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></g>
+    <g id="i-layers" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></g>
+    <g id="i-timer" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></g>
+    <g id="i-clipboard" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></g>
+    <g id="i-sliders" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/></g>
+    <g id="i-hourglass" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12l-4.41 4.41A2 2 0 0 0 7 17.83V22"/><path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/></g>
+    <g id="i-eye-off" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.53 13.53 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/></g>
+    <g id="i-message" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></g>
+    <g id="i-pencil" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.17 6.81a1 1 0 0 0-3.99-3.99L3.84 16.17a2 2 0 0 0-.5.83l-1.32 4.35a.5.5 0 0 0 .62.62l4.35-1.32a2 2 0 0 0 .83-.5z"/></g>
+    <g id="i-play" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.53.85l12-7.5a1 1 0 0 0 0-1.7l-12-7.5A1 1 0 0 0 7 4.5z"/></g>
+    <g id="i-pause" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></g>
+    <g id="i-replay" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></g>
+    <g id="i-prev" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></g>
+    <g id="i-next" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></g>
+    <g id="i-target" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g>
+    <g id="i-menu" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></g>
+    <g id="i-x" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Navigation -->
+<header class="nav" id="nav">
+  <nav class="wrap nav-inner" aria-label="Main">
+    <a href="#top" class="brand" aria-label="DataOrbyt home"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg><span>data <b>orbyt</b></span></a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#questions">What you can learn</a></li>
+      <li><a href="#claude">How Claude fits in</a></li>
+      <!-- No pricing exists yet: link to the early-access section instead of inventing plans. -->
+      <li><a href="#early-access">Talk to us</a></li>
+    </ul>
+    <div class="nav-aux">
+      <!-- There is no sign-in yet; the product runs as a demo workspace. -->
+      <a class="link" href="/" data-app-link>Open demo app</a>
+      <a class="btn btn-primary btn-sm" href="#early-access">Get early access</a>
+    </div>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg>
+    </button>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <a class="item" href="#how-it-works">How it works</a>
+    <a class="item" href="#questions">What you can learn</a>
+    <a class="item" href="#claude">How Claude fits in</a>
+    <a class="item" href="#early-access">Talk to us</a>
+    <a class="item" href="/" data-app-link>Open demo app</a>
+    <a class="btn btn-primary" href="#early-access">Get early access</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section aria-labelledby="hero-title" id="top">
+    <div class="hero-grid" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="wrap hero">
+      <div class="hero-text">
+        <h1 id="hero-title">Know what’s moving your business.</h1>
+        <p class="lede">Connect Claude to DataOrbyt, describe the metrics you want, and get a dashboard draft built from approved business metrics. Open the full dashboard in DataOrbyt to explore it and share it with your team.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#how-it-works">See how it works <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-down"/></svg></a>
+          <a class="btn btn-secondary" href="#early-access">Get early access</a>
+        </div>
+        <p class="qualifier">For founders and small teams who want answers without a long dashboard setup.</p>
+      </div>
+
+      <!-- Autoplay walkthrough: the product story now lives directly in the hero. -->
+      <div class="hero-visual" id="how-it-works">
+        <div class="dots" aria-hidden="true"></div>
+        <div class="story" id="story" aria-label="How DataOrbyt turns a question into a shared dashboard">
+        <div class="scenes">
+          <!-- Step 1 -->
+          <figure class="scene" id="scene-0" aria-labelledby="scene-0-title">
+            <div class="scene-text">
+              <div class="scene-label"><span class="n" aria-hidden="true">1</span><h3 id="scene-0-title">Ask in Claude</h3><span class="tag tag-surface-claude">Inside Claude</span></div>
+              <figcaption>Describe what you want to understand, in your own words. No query language and no chart builder to learn.</figcaption>
+            </div>
+            <div class="scene-visual">
+              <div class="mini-title"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg>Claude · new message</div>
+              <div class="mini-input"><span class="typing" data-type="Show weekly activation, paid conversion, and revenue by signup cohort.">Show weekly activation, paid conversion, and revenue by signup cohort.</span><span class="caret" aria-hidden="true"></span><span class="send" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-arrow-up"/></svg></span></div>
+            </div>
+          </figure>
+
+          <!-- Step 2 -->
+          <figure class="scene" id="scene-1" aria-labelledby="scene-1-title">
+            <div class="scene-text">
+              <div class="scene-label"><span class="n" aria-hidden="true">2</span><h3 id="scene-1-title">Use trusted metrics</h3><span class="tag tag-surface-app">DataOrbyt</span></div>
+              <figcaption>DataOrbyt matches your request to metrics your team has already defined and approved, so each number means the same thing everywhere.</figcaption>
+            </div>
+            <div class="scene-visual">
+              <div class="mini-title"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg>DataOrbyt · matching approved metrics</div>
+              <ul class="metric-list">
+                <li class="metric-row reveal" style="--i:0"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><span><b>Weekly activation</b><small>activated ÷ signups, by week</small></span><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Approved</span></li>
+                <li class="metric-row reveal" style="--i:1"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><span><b>Paid conversion</b><small>paid ÷ trials started</small></span><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Approved</span></li>
+                <li class="metric-row reveal" style="--i:2"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><span><b>Revenue by cohort</b><small>successful charges, by signup week</small></span><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Approved</span></li>
+              </ul>
+            </div>
+          </figure>
+
+          <!-- Step 3 -->
+          <figure class="scene" id="scene-2" aria-labelledby="scene-2-title">
+            <div class="scene-text">
+              <div class="scene-label"><span class="n" aria-hidden="true">3</span><h3 id="scene-2-title">See the dashboard inline</h3><span class="tag tag-surface-claude">Inside Claude</span></div>
+              <figcaption>A compact dashboard preview appears in the conversation, with key numbers and a chart. Inline previews in Claude are in development.</figcaption>
+            </div>
+            <div class="scene-visual">
+              <div class="dash-card reveal" style="--i:0">
+                <div class="dash-head"><span class="t"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg>Activation &amp; revenue by cohort</span><span class="tags"><span class="tag tag-demo">Demo data</span></span></div>
+                <div class="dash-body">
+                  <div class="kpi3">
+                    <div class="kpi"><div class="l">Weekly activation</div><div class="v num">42.1%</div></div>
+                    <div class="kpi"><div class="l">Paid conversion</div><div class="v num">18.9%</div></div>
+                    <div class="kpi"><div class="l">Revenue, 30d</div><div class="v num">$149.1K</div></div>
+                  </div>
+                  <div class="chart-box" role="img" aria-label="Revenue by signup cohort, rising over six weeks. Demo data.">
+                    <div class="bars" aria-hidden="true" style="height:54px;margin-top:4px"><span style="height:46%"></span><span style="height:54%"></span><span style="height:60%"></span><span style="height:57%"></span><span style="height:68%"></span><span style="height:75%"></span></div>
+                  </div>
+                </div>
+                <div class="dash-foot"><small>Draft · ready to review</small><span class="open-btn" aria-hidden="true">Open full dashboard <svg viewBox="0 0 24 24"><use href="#i-external"/></svg></span></div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- Step 4 -->
+          <figure class="scene" id="scene-3" aria-labelledby="scene-3-title">
+            <div class="scene-text">
+              <div class="scene-label"><span class="n" aria-hidden="true">4</span><h3 id="scene-3-title">Open the full view</h3><span class="tag tag-surface-app">In DataOrbyt</span></div>
+              <figcaption>The full dashboard opens in the DataOrbyt web app. Change filters and time ranges, check what each metric means, and see how fresh the data is.</figcaption>
+            </div>
+            <div class="scene-visual">
+              <div class="app-frame reveal" style="--i:0">
+                <div class="app-bar"><span class="brand"><svg width="16" height="16" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg><span>data <b>orbyt</b></span></span><span class="sep">/</span>Activation &amp; revenue by cohort<span class="tag tag-demo">Demo data</span></div>
+                <div class="app-content">
+                  <div class="filters"><span class="filter on"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg>Last 8 weeks</span><span class="filter"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-filter"/></svg>Plan: All</span><span class="filter"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-filter"/></svg>Channel: All</span><span class="filter"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pencil"/></svg>Edit</span></div>
+                  <div class="kpi3">
+                    <div class="kpi"><div class="l">Weekly activation</div><div class="v num">42.1%</div></div>
+                    <div class="kpi"><div class="l">Paid conversion ⓘ</div><div class="v num">18.9%</div></div>
+                    <div class="kpi"><div class="l">Revenue, 30d</div><div class="v num">$149.1K</div></div>
+                  </div>
+                  <div class="defn-pop reveal" style="--i:1"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span><b>Paid conversion</b> = paid conversions ÷ trials started. Owner: Finance. Source: a tested data model.</span></div>
+                  <div class="fresh reveal" style="--i:2"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Loaded 2h ago · data through yesterday<span class="dot" aria-hidden="true"></span></div>
+                </div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- Step 5 -->
+          <figure class="scene" id="scene-4" aria-labelledby="scene-4-title">
+            <div class="scene-text">
+              <div class="scene-label"><span class="n" aria-hidden="true">5</span><h3 id="scene-4-title">Share with the team</h3><span class="tag tag-surface-app">In DataOrbyt</span></div>
+              <figcaption>Choose who can see it and share it with teammates, subject to access settings. In the current preview, link sharing is simulated.</figcaption>
+            </div>
+            <div class="scene-visual">
+              <div class="share-modal reveal" style="--i:0">
+                <h4>Share “Activation &amp; revenue by cohort”</h4>
+                <div class="opt"><span class="radio" aria-hidden="true"></span>Only me</div>
+                <div class="opt on"><span class="radio" aria-hidden="true"></span>Everyone in your organization</div>
+                <div class="opt"><span class="radio" aria-hidden="true"></span>Anyone with the link<span class="tag tag-demo">Simulated</span></div>
+                <div class="share-row"><span class="fake-link">example link, not a real URL</span><span class="copy-btn"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-link"/></svg>Copy link</span></div>
+              </div>
+              <div class="toast reveal" style="--i:2"><span class="av" aria-hidden="true">SR</span><span>Sam (teammate) opened the dashboard<small>just now · example</small></span></div>
+            </div>
+          </figure>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem" aria-labelledby="problem-title">
+    <div class="wrap">
+      <div class="head center">
+        <h2 class="h2" id="problem-title">The numbers exist. Seeing them together is the hard part.</h2>
+      </div>
+      <ol class="gaps">
+        <li class="gap">
+          <div class="gap-art" aria-hidden="true">
+            <svg viewBox="0 0 320 156" preserveAspectRatio="xMidYMid meet">
+              <rect x="22" y="34" width="82" height="78" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="34" y="48" width="34" height="5" rx="2.5" fill="#cfd4dc"/>
+              <rect x="34" y="60" width="52" height="8" rx="3" fill="#2a78d6"/>
+              <rect x="34" y="76" width="40" height="5" rx="2.5" fill="#e7ebf0"/>
+              <rect x="34" y="88" width="28" height="5" rx="2.5" fill="#e7ebf0"/>
+              <text x="34" y="128" font-family="ui-sans-serif, system-ui" font-size="10" fill="#8a8f99">Billing</text>
+              <rect x="119" y="24" width="82" height="78" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <circle cx="142" cy="48" r="5" fill="#8d8af5"/><circle cx="160" cy="42" r="5" fill="#4b46e0"/><circle cx="178" cy="52" r="5" fill="#2a78d6"/>
+              <rect x="134" y="66" width="52" height="5" rx="2.5" fill="#cfd4dc"/>
+              <rect x="134" y="78" width="36" height="5" rx="2.5" fill="#e7ebf0"/>
+              <text x="134" y="118" font-family="ui-sans-serif, system-ui" font-size="10" fill="#8a8f99">Events</text>
+              <rect x="216" y="42" width="82" height="78" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <ellipse cx="257" cy="64" rx="18" ry="6" fill="none" stroke="#0e1626" stroke-width="1.5"/>
+              <path d="M239 64v18c0 3.4 8 6 18 6s18-2.6 18-6V64" fill="none" stroke="#0e1626" stroke-width="1.5"/>
+              <path d="M239 73c0 3.4 8 6 18 6s18-2.6 18-6" fill="none" stroke="#0e1626" stroke-width="1.3"/>
+              <text x="226" y="136" font-family="ui-sans-serif, system-ui" font-size="10" fill="#8a8f99">Warehouse</text>
+              <path d="M104 72h8M208 62h8" stroke="#c9ccfb" stroke-width="1.6" stroke-dasharray="2 4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="n">01</span>
+            <h3>Spread across tools</h3>
+            <p>Billing, product events and the warehouse each hold part of the business. None of them shows the whole picture.</p>
+          </div>
+        </li>
+        <li class="gap">
+          <div class="gap-art" aria-hidden="true">
+            <svg viewBox="0 0 320 156" preserveAspectRatio="xMidYMid meet">
+              <rect x="46" y="18" width="228" height="96" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <circle cx="62" cy="32" r="2.5" fill="#e3ded3"/><circle cx="72" cy="32" r="2.5" fill="#e3ded3"/><circle cx="82" cy="32" r="2.5" fill="#e3ded3"/>
+              <rect x="62" y="46" width="58" height="22" rx="6" fill="none" stroke="#d5dae2" stroke-dasharray="3 3"/>
+              <rect x="128" y="46" width="58" height="22" rx="6" fill="none" stroke="#d5dae2" stroke-dasharray="3 3"/>
+              <rect x="194" y="46" width="64" height="22" rx="6" fill="none" stroke="#d5dae2" stroke-dasharray="3 3"/>
+              <rect x="62" y="76" width="196" height="26" rx="6" fill="none" stroke="#d5dae2" stroke-dasharray="3 3"/>
+              <path d="M156 86l7 16 2.4-6.2 6.4 1.6z" fill="#4b46e0"/>
+              <circle cx="78" cy="136" r="6" fill="#fff" stroke="#4b46e0" stroke-width="2"/><circle cx="78" cy="136" r="2.5" fill="#4b46e0"/>
+              <path d="M84 136h28" stroke="#e3ded3"/>
+              <circle cx="124" cy="136" r="6" fill="none" stroke="#d5dae2" stroke-width="1.6"/>
+              <path d="M130 136h28" stroke="#e3ded3"/>
+              <circle cx="170" cy="136" r="6" fill="none" stroke="#d5dae2" stroke-width="1.6"/>
+              <path d="M176 136h28" stroke="#e3ded3"/>
+              <circle cx="216" cy="136" r="6" fill="none" stroke="#d5dae2" stroke-width="1.6"/>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="n">02</span>
+            <h3>Slow to turn into a dashboard</h3>
+            <p>Connecting sources, agreeing definitions and building charts can take longer than the question was worth.</p>
+          </div>
+        </li>
+        <li class="gap">
+          <div class="gap-art" aria-hidden="true">
+            <svg viewBox="0 0 320 156" preserveAspectRatio="xMidYMid meet">
+              <g opacity=".55">
+                <rect x="18" y="28" width="168" height="104" rx="12" fill="#fff" stroke="#e3e6eb"/>
+                <text x="32" y="52" font-family="ui-sans-serif, system-ui" font-size="14" font-weight="700" fill="#b42318">−8%</text>
+                <path d="M32 112 54 104 76 108 98 86 120 94 146 70 168 78" fill="none" stroke="#4b46e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <rect x="118" y="48" width="168" height="40" rx="10" fill="#fff" stroke="#e6e1d6"/>
+              <rect x="132" y="60" width="18" height="16" rx="4" fill="#f6efe2"/>
+              <rect x="158" y="60" width="72" height="6" rx="3" fill="#384252"/>
+              <rect x="158" y="72" width="48" height="5" rx="2.5" fill="#cfd4dc"/>
+              <text x="236" y="71" font-family="ui-sans-serif, system-ui" font-size="9" fill="#8a8f99">Product</text>
+              <rect x="138" y="78" width="164" height="40" rx="10" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="152" y="90" width="18" height="16" rx="4" fill="#e7f5ee"/>
+              <rect x="178" y="90" width="64" height="6" rx="3" fill="#0e1626"/>
+              <rect x="178" y="102" width="42" height="5" rx="2.5" fill="#cfd4dc"/>
+              <text x="246" y="101" font-family="ui-sans-serif, system-ui" font-size="9" fill="#8a8f99">Sales</text>
+            </svg>
+          </div>
+          <div class="body">
+            <span class="n">03</span>
+            <h3>Easy to ignore</h3>
+            <p>Activation, conversion and retention move while reporting waits behind product, sales and customer work.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ANSWER -->
+  <section class="section answer" id="answer" aria-labelledby="answer-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="answer-title">Bring the important numbers into one view.</h2>
+        <p class="intro">Ask in Claude, or build the view directly in DataOrbyt. Either way, it starts from metrics a person has approved.</p>
+      </div>
+      <div class="shifts">
+        <article class="shift">
+          <p class="from"><b>Instead of</b>Data spread across tools</p>
+          <div class="shift-art" aria-hidden="true">
+            <svg viewBox="0 0 230 132" preserveAspectRatio="xMidYMid meet">
+              <rect x="14" y="22" width="46" height="22" rx="7" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="14" y="54" width="46" height="22" rx="7" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="14" y="86" width="46" height="22" rx="7" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="22" y="30" width="22" height="5" rx="2.5" fill="#2a78d6"/>
+              <rect x="22" y="62" width="26" height="5" rx="2.5" fill="#4b46e0"/>
+              <rect x="22" y="94" width="18" height="5" rx="2.5" fill="#0e1626"/>
+              <path d="M60 33C92 33 104 65 128 65M60 65h68M60 97C92 97 104 65 128 65" fill="none" stroke="#c9ccfb" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="128" y="36" width="88" height="58" rx="12" fill="#f4f3ff" stroke="#c9ccfb"/>
+              <path d="M144 58l6 6 12-13" fill="none" stroke="#0f7a52" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="168" y="54" width="34" height="6" rx="3" fill="#3b36b8"/>
+              <rect x="144" y="74" width="56" height="5" rx="2.5" fill="#8d8af5"/>
+            </svg>
+          </div>
+          <div class="to">
+            <h3>One definition, used everywhere</h3>
+            <p>Approve revenue, activation and retention once. Dashboards, alerts and experiments reuse those definitions instead of calculating them again.</p>
+          </div>
+        </article>
+        <article class="shift">
+          <p class="from"><b>Instead of</b>A long dashboard setup</p>
+          <div class="shift-art" aria-hidden="true">
+            <svg viewBox="0 0 230 132" preserveAspectRatio="xMidYMid meet">
+              <rect x="12" y="36" width="86" height="58" rx="14" fill="#fbf8f2" stroke="#e8dfcf"/>
+              <rect x="24" y="50" width="62" height="18" rx="9" fill="#efe9dc"/>
+              <rect x="32" y="56" width="40" height="5" rx="2.5" fill="#8a7a5c"/>
+              <rect x="24" y="74" width="48" height="8" rx="4" fill="#fff"/>
+              <path d="M98 66h22" stroke="#c9ccfb" stroke-width="1.6" stroke-dasharray="4 4"/>
+              <path d="M116 62l6 4-6 4" fill="none" stroke="#8d8af5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="128" y="28" width="90" height="76" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="140" y="42" width="28" height="16" rx="4" fill="#f4f3ff"/>
+              <rect x="174" y="42" width="28" height="16" rx="4" fill="#f6f7f9"/>
+              <path d="M140 84 152 76 164 80 178 68 192 74 206 64" fill="none" stroke="#4b46e0" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="202" cy="40" r="9" fill="#e7f5ee"/><path d="M198 40l2.5 2.5 5-5" fill="none" stroke="#0f7a52" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="to">
+            <h3>A view you review</h3>
+            <p>Describe what you want to understand. DataOrbyt drafts the dashboard from approved metrics, and a person checks it before anyone else sees it.</p>
+          </div>
+        </article>
+        <article class="shift">
+          <p class="from"><b>Instead of</b>Metrics left for later</p>
+          <div class="shift-art" aria-hidden="true">
+            <svg viewBox="0 0 230 132" preserveAspectRatio="xMidYMid meet">
+              <rect x="28" y="18" width="174" height="96" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="42" y="32" width="42" height="28" rx="7" fill="#f4f3ff" stroke="#e1defc"/>
+              <rect x="50" y="40" width="18" height="4" rx="2" fill="#b9b6f5"/><rect x="50" y="48" width="26" height="6" rx="2" fill="#4b46e0"/>
+              <rect x="94" y="32" width="42" height="28" rx="7" fill="#f6f7f9" stroke="#eceef2"/>
+              <rect x="102" y="40" width="18" height="4" rx="2" fill="#cfd4dc"/><rect x="102" y="48" width="22" height="6" rx="2" fill="#2a78d6"/>
+              <rect x="146" y="32" width="42" height="28" rx="7" fill="#f6f7f9" stroke="#eceef2"/>
+              <rect x="154" y="40" width="18" height="4" rx="2" fill="#cfd4dc"/><rect x="154" y="48" width="24" height="6" rx="2" fill="#0e1626"/>
+              <path d="M42 100 62 90 82 94 104 76 126 82 150 68 172 74 188 62" fill="none" stroke="#4b46e0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M42 100 62 90 82 94 104 76 126 82 150 68 172 74 188 62V108H42Z" fill="#4b46e0" opacity=".08"/>
+              <circle class="pulse" cx="150" cy="68" r="8" fill="#4b46e0" opacity=".18"/><circle cx="150" cy="68" r="3" fill="#4b46e0"/>
+            </svg>
+          </div>
+          <div class="to">
+            <h3>Numbers that stay visible</h3>
+            <p>The metrics worth watching stay on a dashboard the team can open, filter and compare, so a change is easier to notice.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="section band" id="capabilities" aria-labelledby="caps-title">
+    <div class="wrap">
+      <div class="head center">
+        <h2 class="h2" id="caps-title">One place to measure, explain and improve your business.</h2>
+        <p class="intro">From the first dashboard to the question of why a number moved, every view is built on the same approved metrics.</p>
+      </div>
+
+      <ul class="caps">
+        <!-- Dashboarding -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="40" y="22" width="280" height="134" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="40" y="22" width="280" height="22" rx="12" fill="#fbfbfc"/><path d="M40 44h280" stroke="#eef0f3"/>
+              <circle cx="54" cy="33" r="3" fill="#e3ded3"/><circle cx="64" cy="33" r="3" fill="#e3ded3"/><circle cx="74" cy="33" r="3" fill="#e3ded3"/>
+              <rect x="54" y="54" width="76" height="34" rx="7" fill="#f4f3ff" stroke="#e1defc"/><rect x="62" y="62" width="30" height="5" rx="2.5" fill="#b9b6f5"/><rect x="62" y="73" width="44" height="8" rx="3" fill="#4b46e0"/>
+              <rect x="142" y="54" width="76" height="34" rx="7" fill="#f6f7f9" stroke="#eceef2"/><rect x="150" y="62" width="30" height="5" rx="2.5" fill="#cfd4dc"/><rect x="150" y="73" width="38" height="8" rx="3" fill="#2a78d6"/>
+              <rect x="230" y="54" width="76" height="34" rx="7" fill="#f6f7f9" stroke="#eceef2"/><rect x="238" y="62" width="30" height="5" rx="2.5" fill="#cfd4dc"/><rect x="238" y="73" width="48" height="8" rx="3" fill="#0e1626"/>
+              <rect x="54" y="98" width="164" height="46" rx="7" fill="#fff" stroke="#eceef2"/>
+              <path d="M62 134 82 124 100 128 120 114 140 118 160 106 180 110 208 102" fill="none" stroke="#4b46e0" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M62 134 82 124 100 128 120 114 140 118 160 106 180 110 208 102V138H62Z" fill="#4b46e0" opacity=".08"/>
+              <rect x="230" y="98" width="76" height="46" rx="7" fill="#fff" stroke="#eceef2"/>
+              <rect x="240" y="122" width="10" height="14" rx="2" fill="#c9ccfb"/><rect x="256" y="114" width="10" height="22" rx="2" fill="#8d8af5"/><rect x="272" y="108" width="10" height="28" rx="2" fill="#4b46e0"/><rect x="288" y="118" width="10" height="18" rx="2" fill="#2a78d6"/>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>Dashboarding</small><span class="cap-no">01</span></div>
+            <h3>See the whole business</h3>
+            <p>Turn approved metrics into clear dashboards your team can filter, compare and share.</p>
+            <ul aria-label="Dashboarding capabilities"><li>Ready-made templates</li><li>Period comparison</li><li>Flexible sharing</li></ul>
+          </div>
+        </li>
+
+        <!-- Reporting & alerts -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="34" y="30" width="190" height="118" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <path d="M50 120 74 112 98 116 122 98 146 104 170 74 194 84 210 80" fill="none" stroke="#2a78d6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M50 92h160" stroke="#eb6834" stroke-width="1.4" stroke-dasharray="4 4"/>
+              <text x="52" y="86" font-family="ui-sans-serif, system-ui" font-size="9" fill="#b2541f">threshold</text>
+              <circle class="pulse" cx="170" cy="74" r="10" fill="#eb6834" opacity=".18"/><circle cx="170" cy="74" r="4" fill="#eb6834"/>
+              <rect x="190" y="50" width="138" height="54" rx="12" fill="#fff" stroke="#f3d4c2" filter="drop-shadow(0 10px 18px rgb(14 22 38 / .12))"/>
+              <rect x="202" y="62" width="26" height="26" rx="8" fill="#fdecea"/><path d="M215 69v7M215 80.5v.5" stroke="#b42318" stroke-width="2" stroke-linecap="round"/>
+              <rect x="236" y="64" width="78" height="6" rx="3" fill="#0e1626"/><rect x="236" y="77" width="60" height="5" rx="2.5" fill="#cfd4dc"/><rect x="236" y="87" width="44" height="5" rx="2.5" fill="#e3e6eb"/>
+              <rect x="190" y="114" width="138" height="34" rx="10" fill="#fbfaf7" stroke="#e6e1d6"/>
+              <rect x="200" y="124" width="14" height="14" rx="4" fill="#eceafd"/><rect x="220" y="126" width="54" height="5" rx="2.5" fill="#384252"/><rect x="220" y="134" width="36" height="4" rx="2" fill="#cfd4dc"/>
+              <rect x="284" y="124" width="34" height="14" rx="7" fill="#4b46e0"/>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>Reporting &amp; alerts</small><span class="cap-no">02</span></div>
+            <h3>Catch changes early</h3>
+            <p>Monitor important metrics and know when they move, disappear or stop updating.</p>
+            <ul aria-label="Reporting and alert capabilities"><li>Smart thresholds</li><li>Freshness checks</li><li>Multi-channel alerts</li></ul>
+          </div>
+        </li>
+
+        <!-- RCA -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="34" y="26" width="120" height="58" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="48" y="40" width="46" height="6" rx="3" fill="#cfd4dc"/><text x="48" y="70" font-family="ui-sans-serif, system-ui" font-size="18" font-weight="700" fill="#0e1626">−12%</text>
+              <path d="M128 66 118 56M128 66l-10 2" fill="none" stroke="#b42318" stroke-width="2" stroke-linecap="round"/>
+              <path d="M154 55h22M176 55c0-12 8-20 20-20h14M176 55c0 12 8 20 20 20h14M176 55v44c0 12 8 20 20 20h14" fill="none" stroke="#c9ccfb" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="210" y="22" width="118" height="26" rx="8" fill="#fff" stroke="#eceef2"/><rect x="220" y="32" width="38" height="6" rx="3" fill="#384252"/><rect x="270" y="31" width="48" height="8" rx="4" fill="#e7f5ee"/>
+              <rect x="210" y="62" width="118" height="26" rx="8" fill="#fff4f2" stroke="#f7c9c1"/><rect x="220" y="72" width="44" height="6" rx="3" fill="#0e1626"/><rect x="270" y="71" width="48" height="8" rx="4" fill="#b42318" opacity=".85"/>
+              <rect x="210" y="106" width="118" height="26" rx="8" fill="#fff" stroke="#eceef2"/><rect x="220" y="116" width="32" height="6" rx="3" fill="#384252"/><rect x="270" y="115" width="48" height="8" rx="4" fill="#f1f3f6"/>
+              <circle class="pulse" cx="204" cy="75" r="9" fill="#b42318" opacity=".15"/>
+              <rect x="34" y="102" width="150" height="46" rx="12" fill="#f4f3ff" stroke="#e1defc"/>
+              <path d="M48 118h8M48 128h8" stroke="#4b46e0" stroke-width="2" stroke-linecap="round"/><rect x="64" y="115" width="90" height="6" rx="3" fill="#4b46e0" opacity=".7"/><rect x="64" y="126" width="66" height="5" rx="2.5" fill="#b9b6f5"/>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>Root-cause analysis</small><span class="cap-no">03</span></div>
+            <h3>Explain what changed</h3>
+            <p>Break a movement down by plan, channel, platform or cohort to find where it came from.</p>
+            <ul aria-label="Root-cause analysis capabilities"><li>Dimension breakdowns</li><li>Metric lineage</li><li>Data health checks</li></ul>
+          </div>
+        </li>
+
+        <!-- Experimentation -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="40" y="24" width="280" height="128" rx="12" fill="#fff" stroke="#e3e6eb"/>
+              <rect x="56" y="38" width="64" height="20" rx="10" fill="#f1f3f6"/><text x="70" y="52" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="600" fill="#4a5262">Control</text>
+              <rect x="128" y="38" width="64" height="20" rx="10" fill="#eceafd"/><text x="140" y="52" font-family="ui-sans-serif, system-ui" font-size="10" font-weight="600" fill="#3b36b8">Variant B</text>
+              <path d="M56 130h248" stroke="#eef0f3"/>
+              <path d="M60 128c30 0 46-56 78-56s48 56 78 56" fill="#cfd4dc" opacity=".45" stroke="#9aa3b2" stroke-width="1.5"/>
+              <path d="M110 128c30 0 46-70 80-70s50 70 82 70" fill="#4b46e0" opacity=".14" stroke="#4b46e0" stroke-width="1.8"/>
+              <path d="M138 72v58M190 58v72" stroke-dasharray="3 4" stroke="#8d8af5"/>
+              <rect x="228" y="40" width="78" height="44" rx="9" fill="#f7f6ff" stroke="#e1defc"/>
+              <text x="238" y="57" font-family="ui-sans-serif, system-ui" font-size="9" fill="#5c6371">Conversion</text>
+              <text x="238" y="75" font-family="ui-sans-serif, system-ui" font-size="15" font-weight="700" fill="#0b6644">+1.4 pts</text>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>Experimentation</small><span class="cap-no">04</span></div>
+            <h3>Measure what worked</h3>
+            <p>Plan experiments and read results alongside the business metrics they are meant to improve.</p>
+            <ul aria-label="Experimentation capabilities"><li>Experiment planning</li><li>Guardrail metrics</li><li>Quality checks</li></ul>
+          </div>
+        </li>
+
+        <!-- Trusted metrics -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="26" y="66" width="70" height="44" rx="10" fill="#fff" stroke="#e3e6eb"/><rect x="38" y="80" width="46" height="5" rx="2.5" fill="#384252"/><rect x="38" y="91" width="32" height="4" rx="2" fill="#cfd4dc"/>
+              <rect x="122" y="66" width="70" height="44" rx="10" fill="#fff" stroke="#e3e6eb"/><rect x="134" y="80" width="46" height="5" rx="2.5" fill="#384252"/><rect x="134" y="91" width="22" height="4" rx="2" fill="#0f7a52"/>
+              <rect x="218" y="60" width="80" height="56" rx="12" fill="#f4f3ff" stroke="#c9ccfb"/><rect x="232" y="76" width="52" height="6" rx="3" fill="#3b36b8"/><rect x="232" y="88" width="38" height="5" rx="2.5" fill="#8d8af5"/><path d="M232 101l5 4 9-9" fill="none" stroke="#0f7a52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M96 88h26M192 88h26" stroke="#8d8af5" stroke-width="1.6" stroke-dasharray="4 5"/>
+              <path d="M298 88h20" stroke="#8d8af5" stroke-width="1.6"/><rect x="318" y="72" width="22" height="32" rx="6" fill="#fff" stroke="#e3e6eb"/><rect x="323" y="90" width="4" height="9" rx="1" fill="#2a78d6"/><rect x="330" y="82" width="4" height="17" rx="1" fill="#4b46e0"/>
+              <text x="30" y="132" font-family="ui-monospace, monospace" font-size="9" fill="#8a8f99">source</text>
+              <text x="126" y="132" font-family="ui-monospace, monospace" font-size="9" fill="#8a8f99">dbt model</text>
+              <text x="222" y="132" font-family="ui-monospace, monospace" font-size="9" fill="#8a8f99">approved metric</text>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>Trusted metrics</small><span class="cap-no">05</span></div>
+            <h3>Trust every number</h3>
+            <p>Define and approve metrics once, then reuse them everywhere without conflicting calculations.</p>
+            <ul aria-label="Trusted metric capabilities"><li>Metric approval</li><li>Tests &amp; freshness</li><li>dbt-ready models</li></ul>
+          </div>
+        </li>
+
+        <!-- AI assistants -->
+        <li class="cap">
+          <div class="cap-art" aria-hidden="true">
+            <svg viewBox="0 0 360 176" preserveAspectRatio="xMidYMid meet">
+              <rect x="34" y="28" width="150" height="120" rx="14" fill="#fbf8f2" stroke="#e8dfcf"/>
+              <rect x="48" y="42" width="18" height="18" rx="5" fill="#d9c7a7"/><rect x="72" y="47" width="48" height="7" rx="3.5" fill="#5a4520" opacity=".7"/>
+              <rect x="74" y="72" width="96" height="22" rx="10" fill="#efe9dc"/><rect x="84" y="80" width="70" height="6" rx="3" fill="#8a7a5c"/>
+              <rect x="48" y="104" width="122" height="30" rx="8" fill="#fff" stroke="#e3e6eb"/><rect x="58" y="113" width="12" height="12" rx="3" fill="#eceafd"/><rect x="76" y="114" width="60" height="5" rx="2.5" fill="#384252"/><rect x="76" y="123" width="40" height="4" rx="2" fill="#cfd4dc"/>
+              <path d="M184 88h40" stroke="#8d8af5" stroke-width="1.8" stroke-dasharray="5 5"/>
+              <circle cx="210" cy="88" r="12" fill="#fff" stroke="#c9ccfb"/><path d="M206 82v4M214 82v4M203 86h14v3a7 7 0 0 1-14 0Z M210 96v3" fill="none" stroke="#3b36b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="236" y="44" width="92" height="88" rx="14" fill="#fff" stroke="#e3e6eb"/>
+              <g transform="translate(260 58) scale(.68)"><path d="M18.1 20.1A24 24 0 0 1 50 22.7V7h8v27a26 26 0 0 1-20 25.3v-8.2A18 18 0 0 0 47.4 26a16 16 0 0 0-23.5-.7Z" fill="#101116"/><path d="M12.7 29.2a24 24 0 0 0 17.8 30.5v-8.3a16 16 0 0 1-10.2-19.6Z" fill="#101116"/><circle cx="17" cy="25" r="6" fill="#1515f5"/><circle cx="34" cy="36" r="10" fill="#101116"/></g>
+              <rect x="252" y="110" width="60" height="6" rx="3" fill="#cfd4dc"/>
+            </svg>
+          </div>
+          <div class="cap-body">
+            <div class="cap-k"><small>AI assistants</small><span class="cap-no">06</span></div>
+            <h3>Ask in plain language</h3>
+            <p>Use MCP, a standard way for AI assistants to access approved tools, to draft work for your review.</p>
+            <ul aria-label="AI assistant capabilities"><li>Claude or ChatGPT</li><li>Approved metrics only</li><li>Human-reviewed drafts</li></ul>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- THREE STEPS -->
+  <section class="section band" aria-labelledby="steps-title">
+    <div class="wrap">
+      <div class="head center">
+        <h2 class="h2" id="steps-title">Three steps, in plain language.</h2>
+      </div>
+      <ol class="steps3">
+        <li class="s3">
+          <div class="s3-visual" aria-hidden="true">
+            <div class="src-chips"><span class="src-chip on"><svg viewBox="0 0 24 24"><use href="#i-check-circle"/></svg>Billing</span><span class="src-chip on"><svg viewBox="0 0 24 24"><use href="#i-check-circle"/></svg>Product events</span><span class="src-chip"><svg viewBox="0 0 24 24"><use href="#i-database"/></svg>Warehouse</span></div>
+            <div class="src-chips"><span class="src-chip"><svg viewBox="0 0 24 24"><use href="#i-sigma"/></svg>Revenue</span><span class="src-chip"><svg viewBox="0 0 24 24"><use href="#i-sigma"/></svg>Activation</span><span class="src-chip"><svg viewBox="0 0 24 24"><use href="#i-sigma"/></svg>Retention</span></div>
+          </div>
+          <span class="k">Step 1</span>
+          <h3>Connect your data</h3>
+          <p>Connect a supported data source and choose the metrics you trust.</p>
+          <p class="status"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span>Live connectors (for example Stripe, PostHog or a data warehouse) are in development. The current preview uses demo connections and sample data.</span></p>
+        </li>
+        <li class="s3">
+          <div class="s3-visual" aria-hidden="true">
+            <div class="mini-input" style="font-size:12.5px;padding:10px">What changed in activation last week?<span class="send"><svg viewBox="0 0 24 24"><use href="#i-arrow-up"/></svg></span></div>
+          </div>
+          <span class="k">Step 2</span>
+          <h3>Ask for the view</h3>
+          <p>Tell Claude what you want to understand, in your own words. Or build the view directly in DataOrbyt.</p>
+          <p class="status"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span>The connection uses MCP, a standard way for AI assistants to access approved tools and data. Hosted Claude apps can only connect once DataOrbyt is deployed at a public web address.</span></p>
+        </li>
+        <li class="s3">
+          <div class="s3-visual" aria-hidden="true">
+            <div class="toast" style="box-shadow:none"><span class="av">✓</span><span>Draft ready to review<small>Open in DataOrbyt, then share</small></span></div>
+          </div>
+          <span class="k">Step 3</span>
+          <h3>Review and share</h3>
+          <p>Review the dashboard draft, open the full view in DataOrbyt, and share it with your team.</p>
+          <p class="status"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span>Dashboards stay drafts until a person publishes them. Link sharing is simulated in the preview.</span></p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section class="section" id="questions" aria-labelledby="questions-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="questions-title">Make the questions you keep postponing easier to answer.</h2>
+        <p class="intro">Each question becomes a view built from your approved metrics. Seeing them regularly can help your team notice problems earlier and spot growth opportunities worth investigating.</p>
+      </div>
+      <ul class="qgrid">
+        <li class="q"><h3>Are new users activating after signup?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>Activation rate by signup week</p></li>
+        <li class="q"><h3>Which signup cohorts convert to paid plans?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>Trial-to-paid conversion by cohort</p></li>
+        <li class="q"><h3>Is revenue growing because of more customers or higher spend?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>Revenue next to active subscriptions</p></li>
+        <li class="q"><h3>Which acquisition channels bring users who stay?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg>7-day retention by channel</p></li>
+        <li class="q"><h3>Did an experiment improve the primary metric without hurting a guardrail?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flask"/></svg>Experiment readout with guardrails</p></li>
+        <li class="q"><h3>Did activation or conversion change enough to investigate?</h3><p class="view"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg>Alert on a relative change</p></li>
+      </ul>
+      <p class="fine">Better visibility doesn’t guarantee growth. It makes it easier to see what’s changing, so your team can decide what to do about it.</p>
+    </div>
+  </section>
+
+  <!-- TIME / SETUP BURDEN -->
+  <section class="section band" aria-labelledby="time-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="time-title">Spend less time setting up reports. More time acting on what they show.</h2>
+        <p class="intro">Many teams know they should watch activation, retention, and revenue, but the setup feels like another project. DataOrbyt is designed to make the first useful dashboard a prompt-and-review task instead of a blank-canvas exercise.</p>
+      </div>
+      <div class="compare">
+        <div class="path">
+          <h3><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg>Starting from a blank canvas</h3>
+          <ol><li>Pick a dashboard tool and connect data</li><li>Decide how each metric is calculated</li><li>Build charts one at a time</li><li>Check the numbers match other reports</li><li>Share screenshots or ask people to log in</li></ol>
+        </div>
+        <div class="path ours">
+          <h3><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg>With DataOrbyt</h3>
+          <ol><li>Connect a source and approve your metrics once</li><li>Ask for the view you need</li><li>Review the draft and adjust it</li><li>Share it with your team</li></ol>
+          <small>The setup work still happens, but once, rather than again for every new dashboard.</small>
+        </div>
+      </div>
+      <p class="fine">Illustrative comparison, not a measured result. We don’t claim a specific number of hours saved.</p>
+    </div>
+  </section>
+
+  <!-- TWO SURFACES -->
+  <section class="section" aria-labelledby="surfaces-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="surfaces-title">Start in Claude. Continue in DataOrbyt.</h2>
+        <p class="intro">The preview in Claude is a starting point. Your dashboards live in the DataOrbyt web app, where they can be explored, edited, managed and shared.</p>
+      </div>
+      <div class="surfaces">
+        <div class="surface">
+          <h3><span class="badge-ico claude"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg></span>In Claude</h3>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Ask for a dashboard or a metric view</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Review a compact preview <span class="tag tag-planned">In development</span></li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Open the full dashboard in DataOrbyt</li>
+          </ul>
+        </div>
+        <div class="handoff" aria-hidden="true"><span class="h"><svg viewBox="0 0 24 24"><use href="#i-arrow-right"/></svg>open</span><svg class="v" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></div>
+        <div class="surface">
+          <h3><span class="badge-ico brandmark"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg></span>In the DataOrbyt web app</h3>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Explore filters and time ranges</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>See metric definitions and data freshness</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Edit, publish and manage dashboards</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Share with teammates, subject to access settings <span class="tag tag-demo">Link sharing simulated</span></li>
+          </ul>
+          <a class="btn btn-secondary btn-sm" href="/dashboards" data-app-link style="justify-self:start">Browse demo dashboards <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUSTED METRICS -->
+  <section class="section band" aria-labelledby="metrics-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="metrics-title">Everyone should be looking at the same number.</h2>
+        <p class="intro">DataOrbyt connects dashboards to shared metric definitions, so a chart can show where its number comes from and what it means.</p>
+      </div>
+      <ol class="lineage" aria-label="How a number reaches a dashboard">
+        <li class="node"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-database"/></svg></span><small>Your data</small><b>Raw records</b><p class="ex">stripe.charges</p></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="node"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-code"/></svg></span><small>Tested model</small><b>Cleaned, checked table</b><p class="ex">fct_revenue_daily · 3 tests</p></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="node hl"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><small>Defined metric</small><b>One agreed definition</b><p class="ex">gross_revenue · approved</p></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="node"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg></span><small>Dashboard</small><b>The chart you share</b><p class="ex">Founder Overview</p></li>
+      </ol>
+      <p class="dbt-note"><b>What’s dbt?</b> dbt is a tool teams use to organize and test data transformations. DataOrbyt can use those models to keep dashboards connected to documented business metrics. You don’t need to know dbt to read a DataOrbyt dashboard.</p>
+    </div>
+  </section>
+
+  <!-- SUPPORTING FEATURES -->
+  <section class="section" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="support-title">Keep watching once the dashboard exists.</h2>
+      </div>
+      <div class="support">
+        <article class="feat" aria-labelledby="alerts-title">
+          <h3 id="alerts-title"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg></span>Alerts</h3>
+          <p>Get notified when an important metric changes, when data goes missing, or when a data pipeline goes stale. Choose email, Slack or a webhook for each alert.</p>
+          <div class="mock">
+            <div class="alert-head"><span class="alert-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg></span><div style="min-width:0"><small>Example alert · demo values</small><b>Activation rate fell 12% vs. previous 7 days</b></div></div>
+            <ul class="types"><li>Threshold</li><li>Relative change</li><li>Missing data</li><li>Stale pipeline</li></ul>
+          </div>
+          <p class="status"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span>Alert rules and checks work in the preview. Notification delivery is simulated: nothing is actually sent yet.</span></p>
+        </article>
+        <article class="feat" aria-labelledby="exp-title">
+          <h3 id="exp-title"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flask"/></svg></span>Experiments</h3>
+          <p>Connect product experiments to a primary metric and guardrail metrics, and review results next to the rest of your data.</p>
+          <div class="mock">
+            <table class="exp">
+              <caption class="sr-only">Example experiment, demo data</caption>
+              <thead><tr><th scope="col">Variant</th><th scope="col">Exposed</th><th scope="col">Converted</th><th scope="col">Rate</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><span class="swatch" style="background:#2a78d6" aria-hidden="true"></span>Control</th><td class="num">2,540</td><td class="num">457</td><td class="num">18.0%</td></tr>
+                <tr><th scope="row"><span class="swatch" style="background:#eb6834" aria-hidden="true"></span>Guided checklist</th><td class="num">2,522</td><td class="num">541</td><td class="num">21.5%</td></tr>
+              </tbody>
+            </table>
+            <p class="note-box"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span>Demo data, shown as descriptive counts. DataOrbyt only reports a confidence interval when sample-size and assignment-balance checks pass; otherwise results stay descriptive.</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW CLAUDE FITS IN -->
+  <section class="section dark" id="claude" aria-labelledby="claude-title">
+    <div class="wrap fit">
+      <div>
+        <h2 class="h2" id="claude-title">Claude is one way to ask. DataOrbyt does the analytics.</h2>
+        <p class="intro">Claude is one way to ask DataOrbyt for a dashboard. DataOrbyt handles the metric definitions, data access, dashboard, and sharing.</p>
+        <ul class="dark-points">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plug"/></svg><span>The connection uses <b>MCP</b>, a standard for letting AI assistants use approved tools.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg><span>DataOrbyt stays the system that manages dashboards and metrics. Claude can only reach the projects and metrics its access token allows.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Dashboards and alerts created through Claude are drafts. Publishing needs an explicit confirmation.</span></li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg><span>You can always work directly in DataOrbyt, without Claude.</span></li>
+        </ul>
+        <div class="fit-cta">
+          <a class="btn btn-light" href="/mcp-api" data-app-link>Explore MCP setup <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <small>Technical setup details for the MCP connection, in the demo app.</small>
+        </div>
+      </div>
+      <div class="diagram" role="img" aria-label="Diagram: Claude asks; DataOrbyt manages approved metrics, dashboards, permissions and sharing; your data stays in your sources.">
+        <div class="dg-box"><h4><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg>Claude</h4><p>Where you ask questions in plain language.</p></div>
+        <div class="dg-link"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-down"/></svg><span>MCP · approved tools only</span></div>
+        <div class="dg-box main"><h4><svg viewBox="0 0 64 64" aria-hidden="true" style="color:#fff"><use href="#mark"/></svg>DataOrbyt</h4><p>The analytics platform and source of truth.</p><ul><li>Approved metrics</li><li>Dashboards &amp; drafts</li><li>Permissions</li><li>Sharing</li><li>Audit history</li></ul></div>
+        <div class="dg-link"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-down"/></svg><span>controlled, cached queries</span></div>
+        <div class="dg-box"><h4><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-database"/></svg>Your data</h4><p>Billing, product events and your warehouse, connected with the access you authorize.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GOVERNANCE -->
+  <section class="section" aria-labelledby="gov-title">
+    <div class="wrap">
+      <div class="head">
+        <h2 class="h2" id="gov-title">Keep dashboards useful and queries controlled.</h2>
+        <p class="intro">Every chart, alert and Claude request goes through the same controlled query layer. In the current preview these controls run against demo data; real warehouse connections are in development.</p>
+      </div>
+      <ul class="cards four">
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg><span class="tag tag-preview">In preview</span></div><h3>Shared, approved metrics</h3><p>Charts and requests use defined metrics, not one-off queries.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-timer"/></svg><span class="tag tag-preview">In preview</span></div><h3>Cached results</h3><p>Repeated dashboard views reuse results until the data changes.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layers"/></svg><span class="tag tag-principle">Design approach</span></div><h3>Pre-aggregated models</h3><p>Daily summary tables where appropriate, so common views stay light.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gauge"/></svg><span class="tag tag-preview">In preview</span></div><h3>Limits and visibility</h3><p>Query limits, a daily budget per project, and usage you can see.</p></li>
+      </ul>
+      <p class="fine">We don’t promise a specific reduction in warehouse costs, and dbt on its own doesn’t make queries cheap. These controls make query use visible and bounded.</p>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="section band" aria-labelledby="privacy-title">
+    <div class="wrap privacy-grid">
+      <div>
+        <h2 class="h2" id="privacy-title">Your analytics should respect your data boundaries.</h2>
+        <p class="intro">These are the principles DataOrbyt is built around, each marked with its status today. We don’t claim certifications or compliance programs we haven’t completed.</p>
+      </div>
+      <ul class="cards">
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg><span class="tag tag-principle">Design principle</span></div><h3>Customer-authorized access</h3><p>DataOrbyt only connects to the sources you add, with the least access each one needs.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-key"/></svg><span class="tag tag-preview">In preview</span></div><h3>Secrets stay on the server</h3><p>Credentials are handled on the server and never kept in the browser. Access tokens are shown once and stored hashed.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lock"/></svg><span class="tag tag-planned">Partly on roadmap</span></div><h3>Project-scoped access</h3><p>Access tokens are limited to specific projects today. Per-user sign-in and roles are on the roadmap.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-scroll"/></svg><span class="tag tag-preview">In preview</span></div><h3>Demo data is labelled</h3><p>Sample and simulated data always carries a visible “Demo data” label.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="section cta-shell" id="early-access" aria-labelledby="cta-title">
+    <div class="cta">
+      <svg class="orbits" viewBox="0 0 800 400" fill="none" aria-hidden="true"><ellipse cx="400" cy="200" rx="380" ry="150" stroke="#4b46e0" transform="rotate(-18 400 200)"/><ellipse cx="400" cy="200" rx="300" ry="110" stroke="#4b46e0" stroke-dasharray="2 6" transform="rotate(-18 400 200)"/><circle cx="690" cy="88" r="5" fill="#1515f5"/></svg>
+      <div class="cta-inner">
+        <h2 id="cta-title">Start with the questions you already have.</h2>
+        <p>DataOrbyt is in early access. Leave your email to hear when you can connect your own data, or explore the demo workspace today.</p>
+        <div class="form-wrap">
+          <!-- No signup backend exists: the form validates locally and says plainly that nothing was sent. -->
+          <form id="ea-form" novalidate aria-describedby="ea-status">
+            <div class="form-row">
+              <label class="sr-only" for="ea-email">Work email</label>
+              <input id="ea-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" />
+              <label class="sr-only" for="ea-role">Your role</label>
+              <select id="ea-role" name="role"><option>Founder</option><option>Product team</option><option>Data / analytics</option><option>Something else</option></select>
+              <button class="btn btn-submit" type="submit" id="ea-submit">Get early access</button>
+            </div>
+            <p class="form-status" id="ea-status" aria-live="polite">Prototype form: no signup service is connected yet, so nothing is sent or stored.</p>
+          </form>
+          <div class="result" id="ea-result" role="status" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg>
+            <div>
+              <b>Prototype only. Your request was not sent.</b>
+              <p>This page has no signup service connected, so <strong id="ea-echo"></strong> wasn’t submitted or stored anywhere. You can explore DataOrbyt now in the demo workspace.</p>
+              <div class="actions">
+                <a class="btn btn-primary btn-sm" href="/" data-app-link>Open the demo app</a>
+                <button class="btn btn-ghost-dark btn-sm" type="button" id="ea-reset">Start over</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer">
+    <div>
+      <span class="brand"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg><span>data <b>orbyt</b></span></span>
+      <p>Business dashboards for founders and small teams, built from approved metrics. Ask in Claude, or work directly in DataOrbyt.</p>
+    </div>
+    <nav aria-label="Footer">
+      <span>Demo app</span>
+      <a href="/" data-app-link>Overview</a>
+      <a href="/dashboards" data-app-link>Dashboards</a>
+      <a href="/metrics" data-app-link>Metrics</a>
+      <a href="/alerts" data-app-link>Alerts</a>
+      <a href="/experiments" data-app-link>Experiments</a>
+      <a href="/mcp-api" data-app-link>MCP setup</a>
+    </nav>
+  </div>
+  <div class="wrap signoff"><span>Built for clear decisions.</span><span>Product images are illustrative mockups with demo data.</span></div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- App links ----------------------------------------------------------
+  // Links into the DataOrbyt app are relative ("/dashboards"). When this file is
+  // opened straight from disk (file://) there is no server behind it, so point
+  // them at the local dev server. Change APP_ORIGIN if you use another port.
+  var APP_ORIGIN = "http://localhost:3000";
+  if (location.protocol === "file:") {
+    document.querySelectorAll("[data-app-link]").forEach(function (a) {
+      a.href = APP_ORIGIN + a.getAttribute("href");
+      a.title = "Opens the DataOrbyt demo app (start it with: npm run dev)";
+    });
+  }
+
+  // ---- Sticky nav ---------------------------------------------------------
+  var nav = document.getElementById("nav");
+  window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 8); }, { passive: true });
+
+  // ---- Mobile menu --------------------------------------------------------
+  var menuBtn = document.getElementById("menu-btn");
+  var menu = document.getElementById("mobile-menu");
+  function setMenu(open, returnFocus) {
+    menu.hidden = !open;
+    nav.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menuBtn.querySelector("use").setAttribute("href", open ? "#i-x" : "#i-menu");
+    if (open) menu.querySelector("a").focus();
+    else if (returnFocus) menuBtn.focus();
+  }
+  menuBtn.addEventListener("click", function () { setMenu(menu.hidden); });
+  menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) setMenu(false, true); });
+  window.addEventListener("resize", function () { if (window.innerWidth >= 900 && !menu.hidden) setMenu(false); });
+
+  // ---- Hero walkthrough ----------------------------------------------------
+  // The five scenes loop while the hero is visible. There are intentionally no
+  // playback controls; reduced-motion visitors see the first scene statically.
+  var story = document.getElementById("story");
+  var scenes = Array.prototype.slice.call(story.querySelectorAll(".scene"));
+  var DUR = [5200, 5000, 5200, 5400, 5200];
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var idx = 0, timer = null, inView = false, typeTimer = null;
+
+  function typeScene(scene) {
+    var el = scene.querySelector(".typing");
+    clearInterval(typeTimer);
+    if (!el) return;
+    var full = el.getAttribute("data-type");
+    el.textContent = "";
+    var i = 0;
+    typeTimer = setInterval(function () {
+      i += 2;
+      el.textContent = full.slice(0, i);
+      if (i >= full.length) clearInterval(typeTimer);
+    }, 45);
+  }
+
+  function show(i) {
+    idx = (i + scenes.length) % scenes.length;
+    scenes.forEach(function (s, k) {
+      var on = k === idx;
+      s.classList.toggle("active", on);
+      if (on) { s.removeAttribute("aria-hidden"); s.inert = false; }
+      else { s.setAttribute("aria-hidden", "true"); s.inert = true; }
+    });
+    typeScene(scenes[idx]);
+    if (inView && !reduce.matches) schedule();
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(function () { show(idx + 1); }, DUR[idx]);
+  }
+
+  function applyMotionPreference() {
+    clearTimeout(timer);
+    clearInterval(typeTimer);
+    story.classList.add("is-player");
+    show(0);
+  }
+
+  // Pause offscreen to avoid background work, then continue looping on return.
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        inView = e.isIntersecting;
+        clearTimeout(timer);
+        if (inView) show(idx);
+      });
+    }, { threshold: 0.2 }).observe(story);
+  } else { inView = true; }
+
+  applyMotionPreference();
+  if (reduce.addEventListener) reduce.addEventListener("change", applyMotionPreference);
+
+  // ---- Early-access form (prototype: nothing is sent or stored) ---------------
+  var form = document.getElementById("ea-form");
+  var email = document.getElementById("ea-email");
+  var role = document.getElementById("ea-role");
+  var submit = document.getElementById("ea-submit");
+  var statusEl = document.getElementById("ea-status");
+  var result = document.getElementById("ea-result");
+  var IDLE = statusEl.textContent;
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function validate(v) {
+    v = v.trim();
+    if (!v) return "Enter your work email.";
+    if (v.length > 254 || !EMAIL_RE.test(v)) return "That doesn’t look like a valid email address.";
+    return null;
+  }
+  function setStatus(msg, isError) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("err", !!isError);
+    email.setAttribute("aria-invalid", isError ? "true" : "false");
+  }
+  function setBusy(busy) {
+    email.disabled = role.disabled = submit.disabled = busy;
+    submit.innerHTML = busy ? '<span class="spinner" aria-hidden="true"></span> Checking…' : "Get early access";
+  }
+  email.addEventListener("input", function () { if (email.getAttribute("aria-invalid") === "true") setStatus(IDLE, false); });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var problem = validate(email.value);
+    if (problem) { setStatus(problem, true); email.focus(); return; }
+    if (navigator.onLine === false) { setStatus("You appear to be offline. Check your connection and try again.", true); return; }
+    setStatus("Checking…", false);
+    setBusy(true);
+    // Brief pause so the loading state is perceivable. No network request is made.
+    setTimeout(function () {
+      setBusy(false);
+      document.getElementById("ea-echo").textContent = email.value.trim();
+      form.hidden = true;
+      result.hidden = false;
+    }, 600);
+  });
+  document.getElementById("ea-reset").addEventListener("click", function () {
+    result.hidden = true;
+    form.hidden = false;
+    form.reset();
+    setStatus(IDLE, false);
+    email.focus();
+  });
+})();
+</script>
+</body>
+</html>

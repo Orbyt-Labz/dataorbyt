@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Landing page: v1 vs current</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; display: flex; flex-direction: column; background: #e9e6de; color: #0e1626; font: 14px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 10px 16px; background: #fff; border-bottom: 1px solid #ddd8cc; }
+  header h1 { margin: 0; font-size: 15px; font-weight: 600; }
+  .group { display: inline-flex; border: 1px solid #d9d4c8; border-radius: 8px; overflow: hidden; }
+  .group button { border: 0; background: #fff; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; color: #384252; }
+  .group button + button { border-left: 1px solid #d9d4c8; }
+  .group button[aria-pressed="true"] { background: #4b46e0; color: #fff; }
+  label.sync { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #384252; }
+  header .open { margin-left: auto; display: flex; gap: 12px; font-size: 13px; }
+  header .open a { color: #4b46e0; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
+  .pane { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #fff; border: 1px solid #ddd8cc; border-radius: 10px; overflow: hidden; }
+  .pane h2 { margin: 0; padding: 8px 12px; font-size: 13px; font-weight: 600; border-bottom: 1px solid #eee9df; display: flex; gap: 8px; align-items: baseline; }
+  .pane h2 small { font-weight: 400; color: #5c6371; }
+  .stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+  .stage iframe { position: absolute; top: 0; left: 0; border: 0; transform-origin: 0 0; background: #f6f4ef; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; grid-auto-rows: minmax(70vh, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Landing page: v1 vs current</h1>
+  <div class="group" role="group" aria-label="Viewport width">
+    <button type="button" data-w="1440" aria-pressed="true">Desktop 1440</button>
+    <button type="button" data-w="1024" aria-pressed="false">Tablet 1024</button>
+    <button type="button" data-w="390" aria-pressed="false">Mobile 390</button>
+  </div>
+  <label class="sync"><input type="checkbox" id="sync" checked /> Sync scrolling</label>
+  <span class="open"><a id="open-v1" href="#" target="_blank" rel="noopener">Open v1</a><a id="open-v2" href="#" target="_blank" rel="noopener">Open current</a></span>
+</header>
+<main>
+  <section class="pane" aria-label="Version 1">
+    <h2>v1 · Oct 16 <small>“Know what’s moving your business.”</small></h2>
+    <div class="stage"><iframe id="f1" title="Landing page version 1"></iframe></div>
+  </section>
+  <section class="pane" aria-label="Current version">
+    <h2>Current · Oct 17 <small>“Ask Claude for a dashboard.”</small></h2>
+    <div class="stage"><iframe id="f2" title="Current landing page"></iframe></div>
+  </section>
+</main>
+<script>
+(function () {
+  // Served by the app at /landing-page/compare, or opened from disk next to the HTML files.
+  var fromDisk = location.protocol === "file:";
+  var src1 = fromDisk ? "v1/index.html" : "/landing-page/v1";
+  var src2 = fromDisk ? "index.html" : "/landing-page";
+  var f1 = document.getElementById("f1"), f2 = document.getElementById("f2");
+  f1.src = src1; f2.src = src2;
+  document.getElementById("open-v1").href = src1;
+  document.getElementById("open-v2").href = src2;
+
+  var width = 1440;
+  function fit() {
+    [f1, f2].forEach(function (f) {
+      var stage = f.parentElement;
+      var scale = Math.min(1, stage.clientWidth / width);
+      f.style.width = width + "px";
+      f.style.height = stage.clientHeight / scale + "px";
+      f.style.transform = "scale(" + scale + ")";
+    });
+  }
+  document.querySelectorAll("[data-w]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      width = Number(b.getAttribute("data-w"));
+      document.querySelectorAll("[data-w]").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      fit();
+    });
+  });
+  window.addEventListener("resize", fit);
+  fit();
+
+  // Sync scroll by page fraction (the two pages differ in length). Works when the
+  // frames are same-origin: always over http, and from disk in most browsers.
+  var syncing = false;
+  function hook(from, to) {
+    from.addEventListener("load", function () {
+      try {
+        from.contentWindow.addEventListener("scroll", function () {
+          if (!document.getElementById("sync").checked || syncing) return;
+          var a = from.contentDocument.documentElement, b = to.contentDocument.documentElement;
+          var frac = a.scrollTop / Math.max(1, a.scrollHeight - a.clientHeight);
+          syncing = true;
+          to.contentWindow.scrollTo(0, frac * (b.scrollHeight - b.clientHeight));
+          requestAnimationFrame(function () { syncing = false; });
+        }, { passive: true });
+      } catch (e) { /* cross-origin (some browsers from file://): sync unavailable */ }
+    });
+  }
+  hook(f1, f2); hook(f2, f1);
+})();
+</script>
+</body>
+</html>

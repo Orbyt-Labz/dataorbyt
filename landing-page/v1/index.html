@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- ARCHIVED v1 (Oct 16, 2026): kept for side-by-side comparison with the current page. Not linked from the site. -->
+<meta name="robots" content="noindex" />
+<title>DataOrbyt — Your business data, turned into decisions you can share</title>
+<meta name="description" content="Connect your data sources, define trusted metrics with dbt, and publish a live founder dashboard in a day. Alerts, experiments and optional MCP access for Claude and ChatGPT. No LLM required." />
+<meta property="og:title" content="DataOrbyt — Know what's moving your business" />
+<meta property="og:description" content="Trusted metrics, live dashboards, alerts and experiments for founders and small teams. No LLM required." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="theme-color" content="#f6f4ef" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M18.1 20.1A24 24 0 0 1 50 22.7V7h8v27a26 26 0 0 1-20 25.3v-8.2A18 18 0 0 0 47.4 26a16 16 0 0 0-23.5-.7Z' fill='%23101116'/%3E%3Cpath d='M12.7 29.2a24 24 0 0 0 17.8 30.5v-8.3a16 16 0 0 1-10.2-19.6Z' fill='%23101116'/%3E%3Ccircle cx='17' cy='25' r='6' fill='%231515f5'/%3E%3Ccircle cx='34' cy='36' r='10' fill='%23101116'/%3E%3C/svg%3E" />
+<!-- Optional web font. Without network access the page falls back to the system UI font. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f6f4ef; --bg-deep: #efece4; --surface: #fff; --line: #e6e1d6; --line-cool: #e3e6eb;
+    --ink: #0e1626; --ink-2: #384252; --muted: #5c6371; --faint: #6b7280;
+    --accent: #4b46e0; --accent-hover: #3d38c4; --accent-soft: #eceafd; --accent-light: #a9a6ff;
+    --blue: #2a78d6; --orange: #eb6834; --ok: #0b6644; --ok-dot: #0f7a52;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+  ul, ol { padding: 0; list-style: none; }
+  svg { display: block; }
+  .num { font-variant-numeric: tabular-nums; }
+  .mono { font-family: var(--mono); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip { position: absolute; left: 8px; top: -60px; background: #fff; padding: 8px 12px; border-radius: 8px; z-index: 100; }
+  .skip:focus { top: 8px; }
+  .wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  @media (min-width: 640px) { .wrap { padding: 0 32px; } }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 10px; font: 600 14.5px var(--sans); cursor: pointer; border: 0; transition: background .15s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 1px 2px rgb(14 22 38 / .2); }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: rgb(255 255 255 / .7); color: var(--ink); border: 1px solid #d9d4c8; }
+  .btn-secondary:hover { background: #fff; }
+  .btn-light { background: #fff; color: var(--ink); }
+  .btn-light:hover { background: var(--accent-soft); }
+  .btn-sm { height: 36px; padding: 0 16px; font-size: 13.5px; }
+  .btn svg { width: 16px; height: 16px; }
+
+  /* Tags */
+  .tag { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 999px; border: 1px solid; font-size: 11px; font-weight: 500; white-space: nowrap; }
+  .tag-demo { border-color: #efd9ae; background: #fdf3e2; color: #8a4b05; }
+  .tag-preview { border-color: #c4e6d5; background: #e7f5ee; color: var(--ok); }
+  .tag-planned { border-color: #d6dae2; background: #f1f3f6; color: #4a5262; }
+  .tag-principle { border-color: #d4d1fb; background: var(--accent-soft); color: #3b36b8; }
+
+  /* Nav */
+  .nav { position: sticky; top: 0; z-index: 40; background: var(--bg); border-bottom: 1px solid transparent; transition: border-color .2s, background .2s; }
+  .nav.scrolled, .nav.open { background: rgb(246 244 239 / .92); backdrop-filter: blur(10px); border-color: var(--line); }
+  .nav-inner { display: flex; align-items: center; gap: 24px; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 400; letter-spacing: -.045em; color: #101116; }
+  .brand b { color: inherit; font-weight: 700; }
+  .nav-links { display: none; gap: 4px; }
+  .nav-links a, .nav-aux a.link { padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+  .nav-links a:hover, .nav-aux a.link:hover { color: var(--ink); }
+  .nav-aux { margin-left: auto; display: none; align-items: center; gap: 8px; }
+  .menu-btn { margin-left: auto; width: 40px; height: 40px; border-radius: 10px; border: 0; background: transparent; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+  .menu-btn:hover { background: rgb(0 0 0 / .05); }
+  .mobile-menu { border-top: 1px solid var(--line); padding: 8px 20px 20px; }
+  .mobile-menu[hidden] { display: none; }
+  .mobile-menu a.item { display: block; padding: 12px 8px; border-radius: 8px; font-size: 16px; font-weight: 500; }
+  .mobile-menu a.item:hover { background: rgb(0 0 0 / .05); }
+  .mobile-menu .btn { width: 100%; margin-top: 12px; }
+  @media (min-width: 768px) { .nav-links, .nav-aux { display: flex; } .menu-btn, .mobile-menu { display: none !important; } }
+
+  /* Section type */
+  .eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .eyebrow::before { content: ""; width: 20px; height: 1px; background: currentColor; }
+  .h2 { font-size: 30px; line-height: 1.12; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+  .intro { margin-top: 16px; font-size: 16.5px; line-height: 1.65; color: var(--muted); text-wrap: pretty; }
+  @media (min-width: 640px) { .h2 { font-size: 38px; } }
+  .section { padding: 80px 0; }
+  @media (min-width: 640px) { .section { padding: 112px 0; } }
+  .band { background: rgb(239 236 228 / .6); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+  /* Hero */
+  .hero { text-align: center; padding-top: 56px; padding-bottom: 40px; }
+  @media (min-width: 640px) { .hero { padding-top: 80px; } }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; border: 1px solid #e2ddd1; background: rgb(255 255 255 / .7); font-size: 12.5px; font-weight: 500; color: var(--ink-2); margin-bottom: 20px; }
+  .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .hero h1 { max-width: 760px; margin: 0 auto; font-size: 40px; line-height: 1.04; font-weight: 600; letter-spacing: -.035em; text-wrap: balance; }
+  @media (min-width: 640px) { .hero h1 { font-size: 60px; } }
+  .hero .lede { max-width: 660px; margin: 20px auto 0; font-size: 17px; line-height: 1.65; color: var(--muted); text-wrap: pretty; }
+  @media (min-width: 640px) { .hero .lede { font-size: 18.5px; } }
+  .cta-row { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin-top: 32px; }
+  @media (min-width: 640px) { .cta-row { flex-direction: row; } }
+  .reassure { margin-top: 20px; font-size: 13px; color: var(--muted); }
+  .preview-zone { position: relative; padding-bottom: 64px; }
+  @media (min-width: 640px) { .preview-zone { padding-bottom: 96px; } }
+  .dots { position: absolute; inset: 40px 0 0; background-image: radial-gradient(circle at 1px 1px, rgb(14 22 38 / .09) 1px, transparent 0); background-size: 22px 22px; -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%); mask-image: linear-gradient(to bottom, #000, transparent 85%); }
+  .preview { position: relative; max-width: 1080px; margin: 0 auto; }
+  .caption { margin-top: 12px; text-align: center; font-size: 12px; color: var(--muted); }
+
+  /* Product frames */
+  .frame { overflow: hidden; border-radius: 14px; border: 1px solid #e3e0d8; background: #fff; box-shadow: 0 1px 2px rgb(14 22 38 / .05), 0 24px 48px -24px rgb(14 22 38 / .22); text-align: left; }
+  .chrome { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-bottom: 1px solid #eceae4; background: #fbfaf7; }
+  .chrome i { width: 8px; height: 8px; border-radius: 50%; background: #e3ded3; }
+  .chrome span { margin-left: 12px; font: 10.5px var(--mono); color: #8a8f99; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .app { display: flex; }
+  .app-side { display: none; width: 176px; flex-shrink: 0; border-right: 1px solid #eef0f3; background: #fbfbfc; padding: 10px; }
+  @media (min-width: 1024px) { .app-side { display: block; } }
+  .app-side .brand { font-size: 12px; padding: 2px 6px 12px; }
+  .side-item { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: var(--ink-2); }
+  .side-item svg { width: 14px; height: 14px; }
+  .side-item.on { background: #eef0ff; color: var(--accent); }
+  .app-main { flex: 1; min-width: 0; }
+  .topbar { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 12px; border-bottom: 1px solid #eef0f3; }
+  @media (min-width: 640px) { .topbar { padding: 0 16px; } }
+  .chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--line-cool); font-size: 11.5px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .chip svg { width: 12px; height: 12px; color: var(--faint); }
+  .chip .sq { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 3px; background: var(--ink); color: #fff; font-size: 8.5px; font-weight: 700; }
+  .chip-accent { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip-accent svg { color: #fff; }
+  .hide-sm { display: none; }
+  .push-sm { margin-left: auto; }
+  @media (min-width: 640px) { .push-sm { margin-left: 0; } }
+  @media (min-width: 640px) { .hide-sm { display: inline-flex; } }
+  .canvas { background: #f6f7f9; padding: 10px; display: grid; gap: 10px; }
+  @media (min-width: 640px) { .canvas { padding: 14px; } }
+  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  @media (min-width: 1280px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .card { border: 1px solid var(--line-cool); background: #fff; border-radius: 10px; padding: 10px; }
+  .kpi-label { font-size: 10.5px; font-weight: 500; color: var(--ink-2); }
+  .kpi-value { margin-top: 2px; font-size: 19px; line-height: 1.2; font-weight: 600; letter-spacing: -.02em; }
+  .kpi-delta { margin-top: 2px; display: flex; flex-wrap: wrap; gap: 0 6px; font-size: 10px; color: var(--faint); }
+  .kpi-delta b { color: var(--ok); font-weight: 500; }
+  .spark { width: 100%; height: 20px; margin-top: 4px; }
+  .fresh { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line-cool); background: #fff; border-radius: 10px; padding: 6px 10px; font-size: 10.5px; color: var(--ink-2); }
+  .fresh svg { width: 12px; height: 12px; color: var(--ok-dot); }
+  .fresh .muted { color: var(--faint); }
+  .fresh .sla { margin-left: auto; display: none; align-items: center; gap: 4px; color: var(--ok); }
+  @media (min-width: 640px) { .fresh .sla { display: flex; } }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ok-dot); animation: pulse 2.4s ease-in-out infinite; }
+  .split { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 768px) { .split { grid-template-columns: 1.7fr 1fr; } }
+  .card-title { display: flex; align-items: baseline; justify-content: space-between; font-size: 11.5px; font-weight: 600; }
+  .card-title small { font-size: 10px; font-weight: 400; color: var(--faint); display: none; }
+  @media (min-width: 640px) { .card-title small { display: inline; } }
+  .series-label { margin-top: 8px; font-size: 10px; font-weight: 500; color: var(--faint); }
+  .series-label.sep { margin-top: 10px; padding-top: 8px; border-top: 1px solid #f0f1f4; }
+
+  /* Trend chart: y-axis labels + SVG plot */
+  .trend { display: flex; gap: 8px; padding-top: 6px; }
+  .yaxis { position: relative; width: 28px; flex-shrink: 0; font-size: 10px; color: var(--faint); text-align: right; }
+  .yaxis span { position: absolute; right: 0; transform: translateY(-50%); line-height: 1; }
+  .plot { position: relative; flex: 1; min-width: 0; }
+  .plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .xaxis { display: flex; justify-content: space-between; margin: 6px 0 0 36px; font-size: 10px; color: var(--faint); }
+  .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.6s cubic-bezier(.4, 0, .2, 1) .3s forwards; }
+
+  /* Funnel */
+  .funnel li { display: grid; grid-template-columns: 64px 1fr; align-items: center; gap: 8px; font-size: 11px; color: var(--ink-2); margin-top: 6px; }
+  .bar { position: relative; height: 20px; border-radius: 4px; background: #f1f3f6; overflow: hidden; }
+  .bar i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; }
+  .bar span { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); background: rgb(255 255 255 / .9); border-radius: 3px; padding: 0 4px; font-size: 10.5px; font-weight: 500; color: var(--ink); }
+  .note { margin-top: 8px; font-size: 10px; color: var(--faint); }
+
+  /* Stack strip */
+  .strip-head { display: flex; flex-direction: column; gap: 4px; }
+  @media (min-width: 640px) { .strip-head { flex-direction: row; align-items: baseline; justify-content: space-between; } }
+  .strip-head h2 { font-size: 14px; font-weight: 600; }
+  .strip-head p { font-size: 12.5px; color: var(--muted); }
+  .stack { margin-top: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  @media (min-width: 640px) { .stack { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .stack { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+  .stack li { background: #f9f8f4; padding: 16px; }
+  .stack svg { width: 18px; height: 18px; color: var(--accent); }
+  .stack b { display: block; margin-top: 8px; font-size: 14px; font-weight: 600; }
+  .stack span { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+
+  /* Problem + flow */
+  .two { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .two { grid-template-columns: 1.1fr 1fr; gap: 64px; } }
+  .pains li { display: flex; gap: 12px; font-size: 15.5px; line-height: 1.6; color: var(--ink-2); margin-bottom: 16px; }
+  .ico-box { flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; margin-top: 2px; border-radius: 7px; border: 1px solid var(--line); background: #fff; color: var(--muted); }
+  .ico-box svg { width: 14px; height: 14px; }
+  .flow-lead { margin: 56px 0 16px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+  .flow-lead b { color: var(--ink); }
+  .flow { display: grid; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .flow { grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; } }
+  .step { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 1px 2px rgb(14 22 38 / .04); }
+  .step-head { display: flex; align-items: center; gap: 10px; }
+  .badge-ico { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); }
+  .badge-ico svg { width: 16px; height: 16px; }
+  .step-head small { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .step h3 { margin-top: 12px; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .step p { margin-top: 4px; font-size: 14px; line-height: 1.4; color: var(--muted); }
+  .step ul { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .step li { border: 1px solid #eceae4; background: #faf9f6; border-radius: 6px; padding: 2px 6px; font-size: 11.5px; color: var(--ink-2); }
+  .arrow { display: flex; align-items: center; justify-content: center; padding: 8px 0; color: #8d8af5; }
+  .arrow .h { display: none; }
+  @media (min-width: 1024px) { .arrow { padding: 0 6px; } .arrow .h { display: block; } .arrow .v { display: none; } }
+  .flowline { stroke-dasharray: 4 6; animation: flow 1.4s linear infinite; }
+
+  /* Features */
+  .features { background: rgb(255 255 255 / .4); border-top: 1px solid var(--line); }
+  .feature { display: grid; gap: 40px; align-items: center; grid-template-columns: minmax(0, 1fr); }
+  .feature + .feature { margin-top: 96px; }
+  @media (min-width: 640px) { .feature + .feature { margin-top: 128px; } }
+  @media (min-width: 1024px) { .feature { grid-template-columns: 1fr 1fr; gap: 64px; } .feature.flip .copy { order: 2; } }
+  .feature h2 { font-size: 28px; line-height: 1.14; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+  @media (min-width: 640px) { .feature h2 { font-size: 34px; } }
+  .points { margin-top: 24px; }
+  .points li { display: flex; gap: 10px; font-size: 15px; color: var(--ink-2); margin-top: 10px; }
+  .points li::before { content: ""; flex-shrink: 0; width: 6px; height: 6px; margin-top: 8px; border-radius: 50%; background: var(--accent); }
+  .aside-note { margin-top: 20px; padding-left: 12px; border-left: 2px solid #d9d4c8; font-size: 13.5px; color: var(--muted); }
+  .mock { min-width: 0; }
+  .pad { padding: 16px; }
+  @media (min-width: 640px) { .pad { padding: 18px; } }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .row .grow { margin-left: auto; }
+  .title-sm { font-size: 13px; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .defn { margin-top: 12px; display: flex; gap: 8px; align-items: flex-start; background: #f6f7f9; border-radius: 10px; padding: 8px 10px; font-size: 11px; color: var(--ink-2); }
+  .defn svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--accent); margin-top: 1px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 10.5px; color: var(--ink-2); margin-bottom: 6px; align-items: center; }
+  .legend i { display: inline-block; width: 12px; height: 2px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+  .legend i.dash { height: 0; border-top: 1px dashed #9aa3b2; }
+  .lineage li .node { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line-cool); border-radius: 10px; padding: 12px; }
+  .lineage li .node.hl { border-color: #c9ccfb; background: #f4f3ff; }
+  .lineage .nico { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; background: #f1f3f6; color: var(--ink-2); }
+  .lineage .hl .nico { background: var(--accent); color: #fff; }
+  .lineage .nico svg { width: 16px; height: 16px; }
+  .lineage small { display: block; font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .lineage .name { font: 13px var(--mono); }
+  .lineage .ok { margin-left: auto; display: none; align-items: center; gap: 4px; font-size: 11px; color: var(--ok); }
+  @media (min-width: 640px) { .lineage .ok { display: flex; } }
+  .lineage .ok svg { width: 14px; height: 14px; }
+  .lineage .link { margin-left: 29px; height: 16px; border-left: 1px dashed #b9bdf8; }
+  .code { margin-top: 16px; border-radius: 10px; background: #0f1526; padding: 12px; font: 11px/1.7 var(--mono); color: #d7def0; overflow-x: auto; }
+  .code .c { color: #8a94a5; }
+  .alert-head { display: flex; align-items: center; gap: 8px; }
+  .alert-ico { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9px; background: #fdecea; color: #b42318; flex-shrink: 0; }
+  .alert-ico svg { width: 16px; height: 16px; }
+  .alert-head small { display: block; font-size: 11px; color: var(--faint); }
+  .alert-head b { display: block; font-size: 14px; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; font-size: 11.5px; }
+  .stats div { background: #f6f7f9; border-radius: 6px; padding: 6px 8px; }
+  .stats dt { color: var(--faint); }
+  .stats dd { font-weight: 600; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .act { display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--line-cool); font-size: 11.5px; font-weight: 500; color: var(--ink-2); }
+  .act.dark { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .act svg { width: 12px; height: 12px; }
+  .types { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; font-size: 12px; }
+  @media (min-width: 640px) { .types { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .types li { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 10px; color: var(--ink-2); }
+  .types svg { width: 14px; height: 14px; color: var(--accent); flex-shrink: 0; }
+  .small-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
+  table.exp { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 12px; }
+  table.exp th, table.exp td { padding: 8px 0; text-align: right; border-bottom: 1px solid #f3f4f6; }
+  table.exp thead th { font-size: 10.5px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--faint); border-color: #eef0f3; padding: 6px 0; }
+  table.exp th:first-child { text-align: left; }
+  table.exp tbody th { font-weight: 500; }
+  table.exp tbody tr:last-child th, table.exp tbody tr:last-child td { border: 0; }
+  .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .rate-bars { margin-top: 12px; display: grid; gap: 6px; }
+  .rate-bars div { height: 8px; border-radius: 99px; background: #f1f3f6; overflow: hidden; }
+  .rate-bars i { display: block; height: 100%; border-radius: 99px; }
+  .check-note { margin-top: 16px; display: flex; gap: 8px; align-items: flex-start; border: 1px solid var(--line-cool); background: #f6f7f9; border-radius: 10px; padding: 8px 12px; font-size: 11.5px; color: var(--ink-2); }
+  .check-note svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--accent); margin-top: 1px; }
+
+  /* MCP */
+  .dark { background: var(--ink); color: #fff; }
+  .dark .eyebrow { color: var(--accent-light); }
+  .dark .intro { color: #c3c8d4; }
+  .mcp-grid { display: grid; gap: 48px; align-items: center; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .mcp-grid { grid-template-columns: 1fr 1.05fr; gap: 64px; } }
+  .dark-points { margin-top: 32px; }
+  .dark-points li { display: flex; gap: 10px; font-size: 15px; color: #d5dae5; margin-top: 14px; }
+  .dark-points li::before { content: ""; flex-shrink: 0; width: 6px; height: 6px; margin-top: 8px; border-radius: 50%; background: var(--accent-light); }
+  .mcp-cta { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .mcp-cta small { font-size: 12.5px; color: #9aa3b8; }
+  .chat { overflow: hidden; border-radius: 14px; border: 1px solid rgb(255 255 255 / .1); background: #141c31; box-shadow: 0 24px 48px -24px rgb(0 0 0 / .6); }
+  .chat-head { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-bottom: 1px solid rgb(255 255 255 / .1); font-size: 11.5px; color: #9aa6c2; }
+  .chat-head svg { width: 14px; height: 14px; }
+  .chat-head .tag { margin-left: auto; }
+  .chat-body { padding: 16px; display: grid; gap: 16px; }
+  @media (min-width: 640px) { .chat-body { padding: 20px; } }
+  .msg { display: flex; gap: 10px; }
+  .avatar { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex-shrink: 0; border-radius: 50%; background: rgb(255 255 255 / .1); }
+  .avatar svg { width: 14px; height: 14px; }
+  .avatar.bot { background: var(--accent); }
+  .bubble { border-radius: 4px 10px 10px 10px; padding: 8px 12px; font-size: 13.5px; }
+  .bubble.user { background: rgb(255 255 255 / .08); }
+  .bubble.bot { flex: 1; min-width: 0; background: #fff; color: var(--ink); padding: 10px 12px; }
+  .tools { margin-left: 38px; display: grid; gap: 6px; font: 11px var(--mono); }
+  .tools div { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; border: 1px solid rgb(255 255 255 / .1); background: rgb(0 0 0 / .2); border-radius: 6px; padding: 6px 10px; color: #c9d1e6; }
+  .tools svg { width: 12px; height: 12px; color: #5fd4a4; }
+  .tools b { color: var(--accent-light); font-weight: 400; }
+  .tools span { color: #8a94b0; }
+  .draft { margin-top: 10px; border: 1px solid var(--line-cool); border-radius: 6px; padding: 10px; }
+  .draft-head { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; }
+  .draft-head svg { width: 14px; height: 14px; color: var(--accent); }
+  .draft-head .tag { margin-left: auto; }
+  .draft-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 8px; font-size: 11px; color: var(--ink-2); }
+  .draft-metrics span { background: #f6f7f9; border-radius: 4px; padding: 4px 6px; }
+  .draft-note { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 11px; color: var(--muted); }
+  .draft-note svg { width: 12px; height: 12px; }
+
+  /* Cards grids */
+  .cards { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); margin-top: 48px; }
+  @media (min-width: 640px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .cards.five { grid-template-columns: repeat(5, minmax(0, 1fr)); } .cards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .tile { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 20px; transition: box-shadow .2s; }
+  .tile > svg { width: 20px; height: 20px; color: var(--accent); }
+  .tile h3 { margin-top: 12px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .tile p { margin-top: 6px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+  .tile-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tile-top svg { width: 20px; height: 20px; color: var(--ink); }
+  .use .badge-ico { width: 36px; height: 36px; }
+  .use h3 { margin-top: 16px; font-size: 16px; }
+  .use p { font-size: 14.5px; }
+  .use:hover { box-shadow: 0 12px 32px -16px rgb(14 22 38 / .2); }
+  .fine { margin-top: 20px; font-size: 13px; color: var(--muted); }
+  .privacy-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 1024px) { .privacy-grid { grid-template-columns: 1fr 1.4fr; gap: 64px; } }
+  .privacy-grid .cards { margin-top: 0; }
+
+  /* Final CTA */
+  .cta-shell { padding: 0 12px 12px; }
+  @media (min-width: 640px) { .cta-shell { padding: 0 20px 20px; } }
+  .cta { position: relative; overflow: hidden; border-radius: 18px; background: var(--ink); padding: 64px 20px; }
+  @media (min-width: 640px) { .cta { padding: 96px 32px; } }
+  .cta .orbits { position: absolute; right: -160px; bottom: -192px; width: 1040px; height: 520px; opacity: .4; pointer-events: none; }
+  .cta-inner { position: relative; max-width: 680px; margin: 0 auto; text-align: center; }
+  .cta h2 { font-size: 30px; line-height: 1.1; font-weight: 600; letter-spacing: -.03em; color: #fff; text-wrap: balance; }
+  @media (min-width: 640px) { .cta h2 { font-size: 44px; } }
+  .cta-inner > p { max-width: 560px; margin: 16px auto 0; font-size: 16.5px; line-height: 1.65; color: #c3c8d4; }
+  .form-wrap { max-width: 576px; margin: 36px auto 0; text-align: left; }
+  .form-row { display: flex; flex-direction: column; gap: 8px; }
+  @media (min-width: 640px) { .form-row { flex-direction: row; } }
+  .form-row input, .form-row select { height: 44px; border-radius: 10px; border: 1px solid transparent; background: #fff; padding: 0 14px; font: 15px var(--sans); color: var(--ink); }
+  .form-row input { flex: 1; min-width: 0; }
+  .form-row select { font-size: 14px; }
+  @media (min-width: 640px) { .form-row select { width: 160px; } }
+  .form-row input:focus, .form-row select:focus { outline: none; box-shadow: 0 0 0 3px rgb(169 166 255 / .5); }
+  .form-row input[aria-invalid="true"] { border-color: #f19a8f; }
+  .form-row input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgb(241 154 143 / .4); }
+  .form-row input:disabled, .form-row select:disabled { opacity: .6; }
+  .btn-submit { background: #6c67f0; color: #fff; }
+  .btn-submit:hover { background: #5b56e6; }
+  .btn-submit:disabled { opacity: .8; cursor: wait; }
+  .form-status { margin-top: 10px; min-height: 20px; font-size: 13px; color: #9aa3b8; }
+  .form-status.err { color: #ffb4aa; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgb(255 255 255 / .35); border-top-color: #fff; animation: spin .8s linear infinite; }
+  .result { border: 1px solid rgb(255 255 255 / .15); background: rgb(255 255 255 / .06); border-radius: 14px; padding: 20px; display: flex; gap: 12px; }
+  .result > svg { width: 20px; height: 20px; flex-shrink: 0; color: var(--accent-light); margin-top: 2px; }
+  .result b { display: block; font-size: 15px; color: #fff; }
+  .result p { margin-top: 4px; font-size: 14px; line-height: 1.6; color: #c3c8d4; }
+  .result p strong { color: #fff; font-weight: 500; }
+  .result .actions { margin-top: 16px; }
+  .btn-ghost-dark { background: transparent; color: #fff; border: 1px solid rgb(255 255 255 / .2); height: 40px; }
+  .btn-ghost-dark:hover { background: rgb(255 255 255 / .1); }
+
+  /* Footer */
+  .footer { display: flex; flex-direction: column; gap: 32px; padding-top: 48px; padding-bottom: 48px; }
+  @media (min-width: 640px) { .footer { flex-direction: row; justify-content: space-between; align-items: flex-start; } }
+  .footer p { margin-top: 12px; max-width: 300px; font-size: 13.5px; line-height: 1.6; color: var(--muted); }
+  .footer nav { display: grid; grid-template-columns: repeat(2, auto); gap: 8px 48px; font-size: 13.5px; }
+  .footer nav span { grid-column: span 2; margin-bottom: 4px; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .footer nav a { color: var(--ink-2); }
+  .footer nav a:hover { color: var(--ink); text-decoration: underline; }
+  .signoff { display: flex; flex-direction: column; gap: 4px; padding-top: 24px; padding-bottom: 24px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  @media (min-width: 640px) { .signoff { flex-direction: row; justify-content: space-between; } }
+
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes flow { to { stroke-dashoffset: -20; } }
+  @keyframes pulse { 50% { opacity: .35; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .draw { animation: none; stroke-dashoffset: 0; }
+    .flowline, .dot { animation: none; }
+    .spinner { animation-duration: 2.4s; }
+  }
+</style>
+</head>
+<body>
+<!-- Reusable icons (Lucide-style, ISC licence) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-database" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></g>
+    <g id="i-chart" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></g>
+    <g id="i-receipt" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></g>
+    <g id="i-users" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+    <g id="i-boxes" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 7l8 4 8-4-8-4Z"/><path d="m4 12 8 4 8-4"/><path d="m4 17 8 4 8-4"/></g>
+    <g id="i-plug" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></g>
+    <g id="i-file" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></g>
+    <g id="i-code" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></g>
+    <g id="i-sigma" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></g>
+    <g id="i-layout" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></g>
+    <g id="i-gauge" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></g>
+    <g id="i-flask" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.53a2 2 0 0 1-.21.9L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.07-10.12a2 2 0 0 1-.21-.9V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></g>
+    <g id="i-siren" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z"/><path d="M21 12h1"/><path d="M2 12h1"/><path d="M12 2v1"/></g>
+    <g id="i-bell" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></g>
+    <g id="i-check" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></g>
+    <g id="i-check-circle" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></g>
+    <g id="i-info" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></g>
+    <g id="i-alert" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></g>
+    <g id="i-arrow-right" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></g>
+    <g id="i-arrow-down" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></g>
+    <g id="i-arrow-up-right" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></g>
+    <g id="i-calendar" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></g>
+    <g id="i-share" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></g>
+    <g id="i-chevron-down" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></g>
+    <g id="i-clock" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></g>
+    <g id="i-lock" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></g>
+    <g id="i-key" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></g>
+    <g id="i-shield" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></g>
+    <g id="i-scroll" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></g>
+    <g id="i-layers" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></g>
+    <g id="i-timer" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></g>
+    <g id="i-history" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></g>
+    <g id="i-rocket" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></g>
+    <g id="i-workflow" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></g>
+    <g id="i-clipboard" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></g>
+    <g id="i-sheet" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M12 13v8"/></g>
+    <g id="i-bot" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></g>
+    <g id="i-user" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></g>
+    <g id="i-bell-off" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/></g>
+    <g id="i-table" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M12 3v18"/></g>
+    <g id="i-menu" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></g>
+    <g id="i-x" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></g>
+    <g id="mark"><path d="M18.1 20.1A24 24 0 0 1 50 22.7V7h8v27a26 26 0 0 1-20 25.3v-8.2A18 18 0 0 0 47.4 26a16 16 0 0 0-23.5-.7Z" fill="currentColor"/><path d="M12.7 29.2a24 24 0 0 0 17.8 30.5v-8.3a16 16 0 0 1-10.2-19.6Z" fill="currentColor"/><circle cx="17" cy="25" r="6" fill="#1515f5"/><circle cx="34" cy="36" r="10" fill="currentColor"/></g>
+  </defs>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- 1. Navigation -->
+<header class="nav" id="nav">
+  <nav class="wrap nav-inner" aria-label="Main">
+    <a href="#top" class="brand" aria-label="DataOrbyt home"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg><span>data <b>orbyt</b></span></a>
+    <ul class="nav-links">
+      <li><a href="#product">Product</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#use-cases">Use cases</a></li>
+      <!-- No pricing exists yet: link to the early-access section instead of inventing plans. -->
+      <li><a href="#early-access">Talk to us</a></li>
+    </ul>
+    <div class="nav-aux">
+      <!-- No sign-in exists; the app runs as a demo workspace. -->
+      <a class="link" href="/" data-app-link>Open demo app</a>
+      <a class="btn btn-primary btn-sm" href="#early-access">Get early access</a>
+    </div>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-menu"/></svg>
+    </button>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <a class="item" href="#product">Product</a>
+    <a class="item" href="#how-it-works">How it works</a>
+    <a class="item" href="#use-cases">Use cases</a>
+    <a class="item" href="#early-access">Talk to us</a>
+    <a class="item" href="/" data-app-link>Open demo app</a>
+    <a class="btn btn-primary" href="#early-access">Get early access</a>
+  </div>
+</header>
+
+<main id="main">
+  <!-- 2. Hero -->
+  <section aria-labelledby="hero-title" id="top">
+    <div class="wrap hero">
+      <p class="pill">Your business data, turned into decisions you can share.</p>
+      <h1 id="hero-title">Know what’s moving your business.</h1>
+      <p class="lede">Connect your warehouse and business tools. DataOrbyt turns trusted metrics into live dashboards, alerts, and experiment readouts your whole team can understand.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#early-access">Get early access <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        <a class="btn btn-secondary" href="#how-it-works">See how it works</a>
+      </div>
+      <p class="reassure">Built around your data stack. No LLM required.</p>
+    </div>
+
+    <div class="wrap preview-zone" id="product">
+      <div class="dots" aria-hidden="true"></div>
+      <div class="preview">
+        <div class="frame">
+          <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span>app.dataorbyt — Overview</span></div>
+          <div class="app">
+            <aside class="app-side" aria-hidden="true">
+              <div class="brand"><svg width="20" height="20" viewBox="0 0 64 64"><use href="#mark"/></svg><span>data <b>orbyt</b></span></div>
+              <div class="side-item on"><svg viewBox="0 0 24 24"><use href="#i-gauge"/></svg>Overview</div>
+              <div class="side-item"><svg viewBox="0 0 24 24"><use href="#i-layout"/></svg>Dashboards</div>
+              <div class="side-item"><svg viewBox="0 0 24 24"><use href="#i-sigma"/></svg>Metrics</div>
+              <div class="side-item"><svg viewBox="0 0 24 24"><use href="#i-flask"/></svg>Experiments</div>
+              <div class="side-item"><svg viewBox="0 0 24 24"><use href="#i-siren"/></svg>Alerts</div>
+              <div class="side-item"><svg viewBox="0 0 24 24"><use href="#i-boxes"/></svg>dbt</div>
+            </aside>
+            <div class="app-main">
+              <div class="topbar">
+                <span class="chip"><span class="sq">A</span>Acme Analytics<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chevron-down"/></svg></span>
+                <span class="tag tag-demo">Demo data</span>
+                <span class="chip hide-sm" style="margin-left:auto"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg>Last 30 days</span>
+                <span class="chip chip-accent push-sm" id="share-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share"/></svg>Share</span>
+              </div>
+              <div class="canvas">
+                <ul class="kpis">
+                  <li class="card"><div class="kpi-label">Revenue</div><div class="kpi-value num">$149.1K</div><div class="kpi-delta"><b>↗ +22.3%</b>vs $121.9K</div><svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path transform="translate(0,1)" fill="none" stroke="#2a78d6" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,12.0 L3.4,11.6 L6.9,10.8 L10.3,10.5 L13.8,8.5 L17.2,20.0 L20.7,22.0 L24.1,9.5 L27.6,8.6 L31.0,9.2 L34.5,8.7 L37.9,5.9 L41.4,18.6 L44.8,17.0 L48.3,5.8 L51.7,9.0 L55.2,8.5 L58.6,7.4 L62.1,6.2 L65.5,16.8 L69.0,15.3 L72.4,6.9 L75.9,3.2 L79.3,2.9 L82.8,3.6 L86.2,0.1 L89.7,12.1 L93.1,11.9 L96.6,2.7 L100.0,0.0"/></svg></li>
+                  <li class="card"><div class="kpi-label">Active users</div><div class="kpi-value num">7,431</div><div class="kpi-delta"><b>↗ +15.6%</b>vs 6,430</div><svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path transform="translate(0,1)" fill="none" stroke="#2a78d6" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,22.0 L3.4,21.3 L6.9,21.5 L10.3,20.3 L13.8,19.1 L17.2,16.1 L20.7,15.6 L24.1,17.8 L27.6,16.5 L31.0,14.0 L34.5,16.6 L37.9,15.0 L41.4,12.8 L44.8,13.6 L48.3,14.3 L51.7,8.9 L55.2,12.3 L58.6,9.5 L62.1,7.2 L65.5,11.0 L69.0,7.7 L72.4,8.5 L75.9,5.9 L79.3,5.6 L82.8,7.1 L86.2,2.9 L89.7,1.3 L93.1,0.0 L96.6,0.7 L100.0,0.4"/></svg></li>
+                  <li class="card"><div class="kpi-label">Activation rate</div><div class="kpi-value num">42.1%</div><div class="kpi-delta"><b>↗ +1.8 pts</b>vs 40.3%</div><svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path transform="translate(0,1)" fill="none" stroke="#2a78d6" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,8.8 L3.4,8.8 L6.9,8.8 L10.3,22.0 L13.8,13.2 L17.2,13.2 L20.7,22.0 L24.1,4.4 L27.6,4.4 L31.0,8.8 L34.5,13.2 L37.9,8.8 L41.4,8.8 L44.8,13.2 L48.3,8.8 L51.7,17.6 L55.2,4.4 L58.6,4.4 L62.1,4.4 L65.5,13.2 L69.0,4.4 L72.4,4.4 L75.9,4.4 L79.3,4.4 L82.8,0.0 L86.2,4.4 L89.7,4.4 L93.1,17.6 L96.6,13.2 L100.0,13.2"/></svg></li>
+                  <li class="card"><div class="kpi-label">7-day retention</div><div class="kpi-value num">39.3%</div><div class="kpi-delta"><b>↗ +0.8 pts</b>vs 38.5%</div><svg class="spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path transform="translate(0,1)" fill="none" stroke="#2a78d6" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,4.4 L3.4,13.2 L6.9,8.8 L10.3,13.2 L13.8,4.4 L17.2,13.2 L20.7,4.4 L24.1,13.2 L27.6,22.0 L31.0,8.8 L34.5,4.4 L37.9,13.2 L41.4,13.2 L44.8,0.0 L48.3,13.2 L51.7,17.6 L55.2,17.6 L58.6,4.4 L62.1,4.4 L65.5,13.2 L69.0,13.2 L72.4,8.8 L75.9,17.6 L79.3,13.2 L82.8,17.6 L86.2,8.8 L89.7,13.2 L93.1,17.6 L96.6,4.4 L100.0,17.6"/></svg></li>
+                </ul>
+                <div class="fresh"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg><b>Data freshness</b><span class="muted">Loaded 2h ago · data through yesterday</span><span class="sla"><i class="dot" aria-hidden="true"></i>Within SLA</span></div>
+                <div class="split">
+                  <div class="card" style="padding:12px">
+                    <div class="card-title">Revenue and active users <small>Cached · 0 bytes scanned</small></div>
+                    <div class="series-label">Gross revenue (USD)</div>
+                    <figure class="trend" aria-label="Gross revenue, last 30 days, demo data">
+                      <div class="yaxis" style="height:88px" aria-hidden="true"><span style="top:0%">$8K</span><span style="top:50%">$4K</span><span style="top:100%">$0</span></div>
+                      <div class="plot" style="height:88px">
+                        <svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="Gross revenue trend, demo data">
+                          <line x1="0" x2="600" y1="0" y2="0" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="50" y2="50" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="100" y2="100" stroke="#cfd4dc" vector-effect="non-scaling-stroke"/>
+                          <path fill="#2a78d6" opacity=".1" d="M0.0,46.2 L20.7,45.6 L41.4,44.6 L62.1,44.3 L82.8,41.8 L103.4,56.1 L124.1,58.6 L144.8,42.9 L165.5,41.9 L186.2,42.6 L206.9,41.9 L227.6,38.5 L248.3,54.4 L269.0,52.4 L289.7,38.4 L310.3,42.3 L331.0,41.7 L351.7,40.4 L372.4,38.9 L393.1,52.1 L413.8,50.3 L434.5,39.8 L455.2,35.1 L475.9,34.8 L496.6,35.7 L517.2,31.2 L537.9,46.2 L558.6,46.1 L579.3,34.5 L600.0,31.1 L600,100 L0,100 Z"/>
+                          <path class="draw" pathLength="1" fill="none" stroke="#2a78d6" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,46.2 L20.7,45.6 L41.4,44.6 L62.1,44.3 L82.8,41.8 L103.4,56.1 L124.1,58.6 L144.8,42.9 L165.5,41.9 L186.2,42.6 L206.9,41.9 L227.6,38.5 L248.3,54.4 L269.0,52.4 L289.7,38.4 L310.3,42.3 L331.0,41.7 L351.7,40.4 L372.4,38.9 L393.1,52.1 L413.8,50.3 L434.5,39.8 L455.2,35.1 L475.9,34.8 L496.6,35.7 L517.2,31.2 L537.9,46.2 L558.6,46.1 L579.3,34.5 L600.0,31.1"/>
+                        </svg>
+                      </div>
+                    </figure>
+                    <div class="series-label sep">Weekly active users</div>
+                    <figure class="trend" aria-label="Weekly active users, last 30 days, demo data">
+                      <div class="yaxis" style="height:60px" aria-hidden="true"><span style="top:0%">8.0K</span><span style="top:50%">7.0K</span><span style="top:100%">6.0K</span></div>
+                      <div class="plot" style="height:60px">
+                        <svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="Weekly active users trend, demo data">
+                          <line x1="0" x2="600" y1="0" y2="0" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="50" y2="50" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="100" y2="100" stroke="#cfd4dc" vector-effect="non-scaling-stroke"/>
+                          <path class="draw" pathLength="1" fill="none" stroke="#2a78d6" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,78.3 L20.7,76.5 L41.4,77.1 L62.1,74.2 L82.8,71.3 L103.4,64.2 L124.1,62.8 L144.8,68.1 L165.5,65.2 L186.2,59.0 L206.9,65.3 L227.6,61.5 L248.3,56.0 L269.0,58.1 L289.7,59.8 L310.3,46.7 L331.0,54.8 L351.7,48.2 L372.4,42.6 L393.1,51.8 L413.8,43.9 L434.5,45.8 L455.2,39.4 L475.9,38.8 L496.6,42.4 L517.2,32.2 L537.9,28.3 L558.6,25.1 L579.3,27.0 L600.0,26.0"/>
+                        </svg>
+                      </div>
+                    </figure>
+                    <div class="xaxis" aria-hidden="true"><span>Sep 16</span><span>Sep 23</span><span>Sep 30</span><span>Oct 7</span><span>Oct 14</span></div>
+                  </div>
+                  <div class="card" style="padding:12px">
+                    <div class="card-title">Activation funnel</div>
+                    <ol class="funnel" aria-label="Activation funnel, demo data">
+                      <li><span>Visitors</span><span class="bar"><i style="width:100%;background:#0d366b"></i><span class="num">161,154</span></span></li>
+                      <li><span>Signups</span><span class="bar"><i style="width:21.4%;background:#184f95"></i><span class="num">7,370</span></span></li>
+                      <li><span>Activated</span><span class="bar"><i style="width:13.9%;background:#256abf"></i><span class="num">3,106</span></span></li>
+                      <li><span>Trials</span><span class="bar"><i style="width:12.5%;background:#3987e5"></i><span class="num">2,529</span></span></li>
+                      <li><span>Paid</span><span class="bar"><i style="width:5.4%;background:#5598e7"></i><span class="num">478</span></span></li>
+                    </ol>
+                    <p class="note">Visitors → paid, last 30 days</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="caption">Product preview with illustrative demo data from the sample project “Acme Analytics”.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Data-source and workflow strip -->
+  <section class="band" aria-labelledby="stack-title">
+    <div class="wrap" style="padding-top:32px;padding-bottom:32px">
+      <div class="strip-head">
+        <h2 id="stack-title">Designed to sit on top of the tools you already use</h2>
+        <p>Vendor names are examples. Live connectors are in development; the preview uses demo connections.</p>
+      </div>
+      <ul class="stack">
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-database"/></svg><b>Warehouses</b><span>BigQuery, Snowflake, Postgres</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chart"/></svg><b>Product analytics</b><span>PostHog, Mixpanel, Segment</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-receipt"/></svg><b>Billing</b><span>Stripe</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg><b>CRM</b><span>HubSpot</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-boxes"/></svg><b>dbt</b><span>Models, tests, metrics</span></li>
+        <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plug"/></svg><b>MCP</b><span>Claude, ChatGPT</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Problem and product explanation -->
+  <section class="section" id="how-it-works" aria-labelledby="how-title" style="scroll-margin-top:64px">
+    <div class="wrap">
+      <div class="two">
+        <div>
+          <p class="eyebrow">Why DataOrbyt</p>
+          <h2 class="h2" id="how-title">Your data is spread across tools. Your decisions shouldn’t be.</h2>
+        </div>
+        <ul class="pains">
+          <li><span class="ico-box"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sheet"/></svg></span>Metrics live in separate products and spreadsheets, each with its own number.</li>
+          <li><span class="ico-box"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clipboard"/></svg></span>Meetings turn into reconciling definitions instead of deciding what to do.</li>
+          <li><span class="ico-box"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg></span>Dashboards are slow to build, easy to break, and awkward to share.</li>
+          <li><span class="ico-box"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flask"/></svg></span>Product experiments rarely connect back to revenue and retention.</li>
+        </ul>
+      </div>
+      <p class="flow-lead"><b>How it works:</b> Sources → dbt models → trusted metrics → dashboards, alerts and experiments.</p>
+      <ol class="flow" aria-label="How DataOrbyt fits your data stack">
+        <li class="step"><div class="step-head"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-database"/></svg></span><small>Step 1</small></div><h3>Sources</h3><p>Bring business data together</p><ul><li>Warehouse</li><li>Billing</li><li>Product events</li><li>CRM</li></ul></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="step"><div class="step-head"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-code"/></svg></span><small>Step 2</small></div><h3>dbt models</h3><p>Organize transformations and tests</p><ul class="mono"><li>staging</li><li>intermediate</li><li>marts</li></ul></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="step"><div class="step-head"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><small>Step 3</small></div><h3>Trusted metrics</h3><p>Explore and monitor approved definitions</p><ul class="mono"><li>revenue</li><li>activation_rate</li><li>retention_7d</li></ul></li>
+        <li class="arrow" aria-hidden="true"><svg class="h" width="40" height="12" viewBox="0 0 40 12"><line class="flowline" x1="0" y1="6" x2="32" y2="6" stroke="#8d8af5" stroke-width="1.5"/><path d="M31 2 L37 6 L31 10" fill="none" stroke="#8d8af5" stroke-width="1.5"/></svg><svg class="v" width="16" height="16" viewBox="0 0 24 24"><use href="#i-arrow-down"/></svg></li>
+        <li class="step"><div class="step-head"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg></span><small>Step 4</small></div><h3>Dashboards, alerts, experiments</h3><p>Share live views with the team</p><ul><li>Founder Overview</li><li>Alerts</li><li>Readouts</li></ul></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5. Product features -->
+  <section class="section features" aria-label="Product features">
+    <div class="wrap">
+
+      <!-- Feature A -->
+      <article class="feature" id="dashboards" aria-labelledby="fa-title">
+        <div class="copy">
+          <p class="eyebrow">Founder dashboards</p>
+          <h2 id="fa-title">A clearer view of the business, from day one.</h2>
+          <p class="intro">Start with the metrics founders ask about first: revenue, activation, conversion, retention, and product usage. Customize the view as the business grows.</p>
+          <ul class="points"><li>Period-over-period comparison on every KPI</li><li>Definitions one click away</li><li>Share privately, with your organization, or by link</li></ul>
+        </div>
+        <div class="mock">
+          <div class="frame">
+            <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span>Founder Overview</span></div>
+            <div class="pad">
+              <div class="row"><span class="title-sm">Founder Overview</span><span class="tag tag-demo">Demo data</span><span class="chip grow"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg>Last 30 days</span><span class="chip"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share"/></svg>Share</span></div>
+              <div class="grid2">
+                <div class="card"><div class="kpi-label">Revenue ⓘ</div><div class="kpi-value num" style="font-size:20px">$149.1K</div><div class="kpi-delta"><b>+22.3%</b>vs $121.9K prior period</div></div>
+                <div class="card"><div class="kpi-label">Active users ⓘ</div><div class="kpi-value num" style="font-size:20px">7,431</div><div class="kpi-delta"><b>+15.6%</b>vs 6,430 prior period</div></div>
+              </div>
+              <div class="card" style="margin-top:12px;padding:12px">
+                <div class="legend"><b style="color:var(--ink)">Gross revenue</b><span><i style="background:#2a78d6"></i>This period</span><span><i class="dash"></i>Previous period</span></div>
+                <figure class="trend" aria-label="Gross revenue vs previous period, demo data">
+                  <div class="yaxis" style="height:130px" aria-hidden="true"><span style="top:0%">$8K</span><span style="top:25%">$6K</span><span style="top:50%">$4K</span><span style="top:75%">$2K</span><span style="top:100%">$0</span></div>
+                  <div class="plot" style="height:130px">
+                    <svg viewBox="0 0 600 100" preserveAspectRatio="none" role="img" aria-label="Gross revenue this period vs previous period, demo data">
+                      <line x1="0" x2="600" y1="0" y2="0" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="25" y2="25" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="50" y2="50" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="75" y2="75" stroke="#eceef2" vector-effect="non-scaling-stroke"/><line x1="0" x2="600" y1="100" y2="100" stroke="#cfd4dc" vector-effect="non-scaling-stroke"/>
+                      <path fill="none" stroke="#9aa3b2" stroke-width="1.25" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" d="M0.0,56.3 L20.7,57.4 L41.4,53.9 L62.1,51.4 L82.8,56.1 L103.4,66.3 L124.1,62.6 L144.8,52.1 L165.5,52.4 L186.2,50.9 L206.9,55.4 L227.6,49.1 L248.3,63.2 L269.0,62.0 L289.7,49.4 L310.3,49.7 L331.0,50.3 L351.7,48.1 L372.4,46.4 L393.1,62.1 L413.8,61.5 L434.5,46.2 L455.2,49.5 L475.9,48.9 L496.6,50.0 L517.2,50.4 L537.9,59.6 L558.6,61.3 L579.3,48.5 L600.0,48.0"/>
+                      <path fill="#2a78d6" opacity=".1" d="M0.0,46.2 L20.7,45.6 L41.4,44.6 L62.1,44.3 L82.8,41.8 L103.4,56.1 L124.1,58.6 L144.8,42.9 L165.5,41.9 L186.2,42.6 L206.9,41.9 L227.6,38.5 L248.3,54.4 L269.0,52.4 L289.7,38.4 L310.3,42.3 L331.0,41.7 L351.7,40.4 L372.4,38.9 L393.1,52.1 L413.8,50.3 L434.5,39.8 L455.2,35.1 L475.9,34.8 L496.6,35.7 L517.2,31.2 L537.9,46.2 L558.6,46.1 L579.3,34.5 L600.0,31.1 L600,100 L0,100 Z"/>
+                      <path fill="none" stroke="#2a78d6" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="M0.0,46.2 L20.7,45.6 L41.4,44.6 L62.1,44.3 L82.8,41.8 L103.4,56.1 L124.1,58.6 L144.8,42.9 L165.5,41.9 L186.2,42.6 L206.9,41.9 L227.6,38.5 L248.3,54.4 L269.0,52.4 L289.7,38.4 L310.3,42.3 L331.0,41.7 L351.7,40.4 L372.4,38.9 L393.1,52.1 L413.8,50.3 L434.5,39.8 L455.2,35.1 L475.9,34.8 L496.6,35.7 L517.2,31.2 L537.9,46.2 L558.6,46.1 L579.3,34.5 L600.0,31.1"/>
+                    </svg>
+                  </div>
+                </figure>
+                <div class="xaxis" aria-hidden="true"><span>Sep 16</span><span>Sep 23</span><span>Sep 30</span><span>Oct 7</span><span>Oct 14</span></div>
+              </div>
+              <div class="defn"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><span><b>Definition · gross_revenue</b> — SUM(charges.amount) where status = succeeded. Owner: Finance. Source model: <span class="mono">fct_revenue_daily</span>.</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Feature B -->
+      <article class="feature flip" id="metrics" aria-labelledby="fb-title">
+        <div class="copy">
+          <p class="eyebrow">Trusted metrics with dbt</p>
+          <h2 id="fb-title">Make every team use the same definition.</h2>
+          <p class="intro">Keep transformations, tests, and metric logic organized in dbt. Help people understand where a metric comes from before they make a decision with it.</p>
+          <ul class="points"><li>Lineage from source table to dashboard</li><li>Tests and freshness visible next to the number</li><li>New metrics go through review before anyone can chart them</li></ul>
+          <p class="aside-note">dbt standardizes transformations. It doesn’t make warehouse queries free or tune their cost by itself.</p>
+        </div>
+        <div class="mock">
+          <div class="frame">
+            <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span>Metric · gross_revenue · Lineage</span></div>
+            <div class="pad">
+              <ol class="lineage" aria-label="Lineage from source table to dashboard">
+                <li><div class="node"><span class="nico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-database"/></svg></span><div><small>Source table</small><span class="name">stripe.charges</span></div><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>raw, loaded hourly</span></div><div class="link" aria-hidden="true"></div></li>
+                <li><div class="node"><span class="nico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-code"/></svg></span><div><small>dbt model</small><span class="name">fct_revenue_daily</span></div><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>3 tests passing</span></div><div class="link" aria-hidden="true"></div></li>
+                <li><div class="node hl"><span class="nico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg></span><div><small>Metric</small><span class="name">gross_revenue</span></div><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>approved · owner Finance</span></div><div class="link" aria-hidden="true"></div></li>
+                <li><div class="node"><span class="nico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg></span><div><small>Dashboard</small><span class="name">Founder Overview</span></div><span class="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>published · shared with team</span></div></li>
+              </ol>
+              <div class="code" aria-label="Compiled metric query preview"><span class="c">-- compiled from the approved definition</span><br />SELECT date, SUM(gross_revenue) AS value<br />FROM marts.fct_revenue_daily<br />WHERE date BETWEEN @start AND @end</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Feature C -->
+      <article class="feature" id="alerts" aria-labelledby="fc-title">
+        <div class="copy">
+          <p class="eyebrow">Alerts</p>
+          <h2 id="fc-title">Know when a metric needs your attention.</h2>
+          <p class="intro">Set alerts for thresholds, unusual changes, missing data, or stale pipelines. Route notifications to the channels your team uses.</p>
+          <ul class="points"><li>Preview the firing logic and message before saving</li><li>Cooldowns and consecutive checks to cut noise</li><li>Acknowledge, snooze, or pause from one place</li></ul>
+        </div>
+        <div class="mock">
+          <div class="frame">
+            <div class="pad">
+              <div class="alert-head">
+                <span class="alert-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell"/></svg></span>
+                <div style="min-width:0"><small>#founders · DataOrbyt alert</small><b>Activation rate fell 12% vs. previous 7 days</b></div>
+                <span class="tag tag-demo hide-sm" style="margin-left:auto">Simulated delivery</span>
+              </div>
+              <dl class="stats"><div><dt>Current</dt><dd class="num">37.1%</dd></div><div><dt>Previous 7 days</dt><dd class="num">42.1%</dd></div><div><dt>Threshold</dt><dd class="num">−10%</dd></div></dl>
+              <p style="margin-top:12px;font-size:12px;color:var(--ink-2)">Biggest drop: iOS signups (−19%). Fired after 2 consecutive evaluations.</p>
+              <div class="actions">
+                <span class="act dark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Acknowledge</span>
+                <span class="act"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bell-off"/></svg>Snooze 4h</span>
+                <span class="act">Open dashboard <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg></span>
+              </div>
+            </div>
+          </div>
+          <ul class="types">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Threshold</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Relative change</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Missing data</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg>Stale pipeline</li>
+          </ul>
+          <p class="small-note">Example alert with demo values. Email, Slack and webhook delivery are simulated in the current preview.</p>
+        </div>
+      </article>
+
+      <!-- Feature D -->
+      <article class="feature flip" id="experiments" aria-labelledby="fd-title">
+        <div class="copy">
+          <p class="eyebrow">Experiments</p>
+          <h2 id="fd-title">Connect product changes to outcomes.</h2>
+          <p class="intro">Plan experiments, define primary and guardrail metrics, and review results in the context of your product data.</p>
+          <ul class="points"><li>Hypothesis, variants, allocation and sample planning in one flow</li><li>Guardrails on the same governed metrics</li><li>Results stay descriptive until the data supports more</li></ul>
+        </div>
+        <div class="mock">
+          <div class="frame">
+            <div class="chrome" aria-hidden="true"><i></i><i></i><i></i><span>Experiment · Onboarding checklist v2</span></div>
+            <div class="pad">
+              <div class="row"><span class="title-sm">Onboarding checklist v2</span><span class="tag tag-demo">Demo data</span></div>
+              <p style="margin-top:4px;font-size:12px;color:var(--muted)">Primary metric: <span style="color:var(--ink-2);font-weight:500">Trial-to-paid conversion</span> · Guardrails: churn rate, activation rate</p>
+              <table class="exp">
+                <caption class="sr-only">Control versus treatment, demo data</caption>
+                <thead><tr><th scope="col">Variant</th><th scope="col">Exposed</th><th scope="col">Converted</th><th scope="col">Rate</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row"><span class="swatch" style="background:#2a78d6" aria-hidden="true"></span>Control</th><td class="num">2,540</td><td class="num">457</td><td class="num"><b>18.0%</b></td></tr>
+                  <tr><th scope="row"><span class="swatch" style="background:#eb6834" aria-hidden="true"></span>Guided checklist</th><td class="num">2,522</td><td class="num">541</td><td class="num"><b>21.5%</b></td></tr>
+                </tbody>
+              </table>
+              <div class="rate-bars" aria-hidden="true"><div><i style="width:83.8%;background:#2a78d6"></i></div><div><i style="width:100%;background:#eb6834"></i></div></div>
+              <div class="check-note"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-table"/></svg><span>Assignment balance check passed (50.2% / 49.8%). Confidence intervals are shown only when sample-size and sample-ratio checks pass; otherwise results stay descriptive.</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 6. MCP assistant workflow -->
+  <section class="section dark" aria-labelledby="mcp-title">
+    <div class="wrap mcp-grid">
+      <div>
+        <p class="eyebrow">Optional: Claude &amp; ChatGPT via MCP</p>
+        <h2 class="h2" id="mcp-title">Ask your assistant to work with trusted metrics.</h2>
+        <p class="intro">Connect an AI assistant to DataOrbyt through MCP to find metrics, preview dashboard ideas, and prepare dashboard or alert drafts from your governed data model.</p>
+        <ul class="dark-points">
+          <li>DataOrbyt stays the analytics system and source of truth.</li>
+          <li>Assistants can only use approved metrics, within the projects a token allows.</li>
+          <li>Dashboards and alerts arrive as drafts. Publishing needs explicit confirmation.</li>
+          <li>No LLM required. Everything works directly in the product.</li>
+        </ul>
+        <div class="mcp-cta">
+          <a class="btn btn-light" href="/mcp-api" data-app-link>Explore MCP setup <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <small>The MCP server runs in the preview build. Hosted connectors need a public deployment.</small>
+        </div>
+      </div>
+      <div class="chat">
+        <div class="chat-head"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bot"/></svg>Your assistant · connected to DataOrbyt via MCP<span class="tag tag-demo">Illustrative</span></div>
+        <div class="chat-body">
+          <div class="msg"><span class="avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-user"/></svg></span><p class="bubble user">Show weekly activation and paid conversion by signup cohort.</p></div>
+          <div class="tools">
+            <div><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg><b>list_metrics</b><span>project: acme · read-only</span></div>
+            <div><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg><b>get_metric_definition</b><span>activation_rate, trial_to_paid</span></div>
+            <div><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check-circle"/></svg><b>create_dashboard_draft</b><span>private draft · needs review</span></div>
+          </div>
+          <div class="msg"><span class="avatar bot"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-bot"/></svg></span>
+            <div class="bubble bot">I found two approved metrics. Here’s a dashboard draft for review.
+              <div class="draft">
+                <div class="draft-head"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layout"/></svg>Activation by cohort<span class="tag tag-planned">Draft</span></div>
+                <div class="draft-metrics"><span>activation_rate · weekly</span><span>trial_to_paid · weekly</span></div>
+                <div class="draft-note"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lock"/></svg>Publishing requires your confirmation in DataOrbyt.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Cost and data governance -->
+  <section class="section" aria-labelledby="gov-title">
+    <div class="wrap">
+      <div style="max-width:672px">
+        <p class="eyebrow">Cost and governance</p>
+        <h2 class="h2" id="gov-title">Useful answers without uncontrolled warehouse queries.</h2>
+        <p class="intro">Every chart, alert and assistant request goes through one governed query layer. These controls are in the current preview build, which runs against demo data. Real warehouse adapters are in development.</p>
+      </div>
+      <ul class="cards five">
+        <li class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sigma"/></svg><h3>Shared metric definitions</h3><p>Charts, alerts and MCP tools query approved catalog metrics, not ad-hoc SQL.</p></li>
+        <li class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-layers"/></svg><h3>Pre-aggregated, incremental models</h3><p>The dbt starter favors daily marts and incremental models for routine dashboards.</p></li>
+        <li class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-timer"/></svg><h3>Cached dashboard results</h3><p>Identical queries reuse a cached result until the underlying data changes.</p></li>
+        <li class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-gauge"/></svg><h3>Query limits and usage</h3><p>Row limits, timeouts, range caps and a per-project scan budget, with usage by dashboard.</p></li>
+        <li class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-history"/></svg><h3>Permissions and audit history</h3><p>Project-scoped API tokens and an audit trail of changes and MCP tool calls.</p></li>
+      </ul>
+      <p class="fine">We don’t promise a specific reduction in warehouse spend. These controls make query cost visible and bounded.</p>
+    </div>
+  </section>
+
+  <!-- 8. Privacy and security -->
+  <section class="section band" aria-labelledby="privacy-title" style="padding-bottom:96px">
+    <div class="wrap privacy-grid">
+      <div>
+        <p class="eyebrow">Privacy &amp; security</p>
+        <h2 class="h2" id="privacy-title">Your analytics should respect your data boundaries.</h2>
+        <p class="intro">These are the principles DataOrbyt is built around. Each one is marked with its status today. We don’t claim certifications or compliance programs we haven’t completed.</p>
+      </div>
+      <ul class="cards">
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-shield"/></svg><span class="tag tag-principle">Product principle</span></div><h3>Customer-authorized sources only</h3><p>DataOrbyt connects to the sources you add, with the least-privilege access each connector asks for.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-key"/></svg><span class="tag tag-preview">In preview build</span></div><h3>Secrets stay on the server</h3><p>Credentials are sent only to the server and never kept in the browser. API tokens are shown once and stored hashed.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-lock"/></svg><span class="tag tag-planned">Partly on roadmap</span></div><h3>Scoped by workspace and project</h3><p>API tokens are already project-scoped. Per-user sign-in and role enforcement are still on the roadmap.</p></li>
+        <li class="tile"><div class="tile-top"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-scroll"/></svg><span class="tag tag-preview">In preview build</span></div><h3>Demo data is always labelled</h3><p>Seeded and simulated data carries a visible “Demo data” label so it can’t be mistaken for your numbers.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 9. Who it is for -->
+  <section class="section" id="use-cases" aria-labelledby="use-title" style="scroll-margin-top:64px">
+    <div class="wrap">
+      <div style="max-width:672px">
+        <p class="eyebrow">Who it’s for</p>
+        <h2 class="h2" id="use-title">Built for teams who need answers, not a data department.</h2>
+      </div>
+      <ul class="cards four">
+        <li class="tile use"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-rocket"/></svg></span><h3>Early-stage founders</h3><p>See activation, retention, and revenue in one place.</p></li>
+        <li class="tile use"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flask"/></svg></span><h3>Product teams</h3><p>Understand whether product changes improve user outcomes.</p></li>
+        <li class="tile use"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-users"/></svg></span><h3>Small teams</h3><p>Share one live view instead of emailing static screenshots.</p></li>
+        <li class="tile use"><span class="badge-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-workflow"/></svg></span><h3>Data-aware teams</h3><p>Keep dbt models and metric definitions connected to dashboards.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10. Final CTA -->
+  <section class="cta-shell" id="early-access" aria-labelledby="cta-title" style="scroll-margin-top:64px">
+    <div class="cta">
+      <svg class="orbits" viewBox="0 0 800 400" fill="none" aria-hidden="true"><ellipse cx="400" cy="200" rx="380" ry="150" stroke="#4b46e0" transform="rotate(-18 400 200)"/><ellipse cx="400" cy="200" rx="300" ry="110" stroke="#4b46e0" stroke-dasharray="2 6" transform="rotate(-18 400 200)"/><circle cx="690" cy="88" r="5" fill="#a9a6ff"/></svg>
+      <div class="cta-inner">
+        <h2 id="cta-title">Spend less time assembling reports. More time improving the product.</h2>
+        <p>Bring your data stack together and give your team a view they can act on.</p>
+        <div class="form-wrap" id="form-wrap">
+          <!-- No signup backend exists: the form validates locally and says plainly that nothing was sent. -->
+          <form id="ea-form" novalidate aria-describedby="ea-status">
+            <div class="form-row">
+              <label class="sr-only" for="ea-email">Work email</label>
+              <input id="ea-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@company.com" />
+              <label class="sr-only" for="ea-role">Your role</label>
+              <select id="ea-role" name="role"><option>Founder</option><option>Product team</option><option>Data / analytics</option><option>Something else</option></select>
+              <button class="btn btn-submit" type="submit" id="ea-submit">Get early access</button>
+            </div>
+            <p class="form-status" id="ea-status" aria-live="polite">Demo form: no signup service is connected yet, so nothing is sent or stored.</p>
+          </form>
+          <div class="result" id="ea-result" role="status" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg>
+            <div>
+              <b>Demo only. Your request was not sent.</b>
+              <p>This preview has no signup service connected, so <strong id="ea-echo"></strong> wasn’t submitted or stored anywhere. You can explore the product now in the demo workspace.</p>
+              <div class="actions">
+                <a class="btn btn-primary btn-sm" href="/" data-app-link>Open the demo app</a>
+                <button class="btn btn-ghost-dark btn-sm" type="button" id="ea-reset">Start over</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 11. Footer -->
+<footer>
+  <div class="wrap footer">
+    <div>
+      <span class="brand"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><use href="#mark"/></svg><span>data <b>orbyt</b></span></span>
+      <p>No-LLM analytics for founders and small teams: trusted metrics, live dashboards, alerts and experiments.</p>
+    </div>
+    <nav aria-label="Footer">
+      <span>Product (demo app)</span>
+      <a href="/" data-app-link>Overview</a>
+      <a href="/dashboards" data-app-link>Dashboards</a>
+      <a href="/metrics" data-app-link>Metrics</a>
+      <a href="/experiments" data-app-link>Experiments</a>
+      <a href="/alerts" data-app-link>Alerts</a>
+      <a href="/mcp-api" data-app-link>MCP &amp; API</a>
+    </nav>
+  </div>
+  <div class="wrap signoff"><span>Built for clear decisions.</span><span>Product previews show illustrative demo data.</span></div>
+</footer>
+
+<script>
+  // ---- App links ----------------------------------------------------------
+  // Links to the DataOrbyt app are relative ("/dashboards"). When this file is
+  // opened straight from disk (file://) there's no server behind it, so point
+  // them at the local dev server instead. Change APP_ORIGIN if you use another port.
+  var APP_ORIGIN = "http://localhost:3000";
+  if (location.protocol === "file:") {
+    document.querySelectorAll("[data-app-link]").forEach(function (a) {
+      a.href = APP_ORIGIN + a.getAttribute("href");
+      a.title = "Opens the DataOrbyt demo app (start it with: npm run dev)";
+    });
+  }
+
+  // ---- Sticky nav border on scroll -----------------------------------------
+  var nav = document.getElementById("nav");
+  window.addEventListener("scroll", function () { nav.classList.toggle("scrolled", window.scrollY > 8); }, { passive: true });
+
+  // ---- Mobile menu ---------------------------------------------------------
+  var menuBtn = document.getElementById("menu-btn");
+  var menu = document.getElementById("mobile-menu");
+  function setMenu(open, returnFocus) {
+    menu.hidden = !open;
+    nav.classList.toggle("open", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menuBtn.querySelector("use").setAttribute("href", open ? "#i-x" : "#i-menu");
+    if (open) menu.querySelector("a").focus();
+    else if (returnFocus) menuBtn.focus();
+  }
+  menuBtn.addEventListener("click", function () { setMenu(menu.hidden); });
+  menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", function () { setMenu(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !menu.hidden) setMenu(false, true); });
+  window.addEventListener("resize", function () { if (window.innerWidth >= 768 && !menu.hidden) setMenu(false); });
+
+  // ---- Early-access form (demo: nothing is sent or stored) ------------------
+  var form = document.getElementById("ea-form");
+  var email = document.getElementById("ea-email");
+  var role = document.getElementById("ea-role");
+  var submit = document.getElementById("ea-submit");
+  var statusEl = document.getElementById("ea-status");
+  var result = document.getElementById("ea-result");
+  var IDLE = "Demo form: no signup service is connected yet, so nothing is sent or stored.";
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function validate(v) {
+    v = v.trim();
+    if (!v) return "Enter your work email.";
+    if (v.length > 254 || !EMAIL_RE.test(v)) return "That doesn’t look like a valid email address.";
+    return null;
+  }
+  function setStatus(msg, isError) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle("err", !!isError);
+    email.setAttribute("aria-invalid", isError ? "true" : "false");
+  }
+  function setBusy(busy) {
+    email.disabled = role.disabled = submit.disabled = busy;
+    submit.innerHTML = busy ? '<span class="spinner" aria-hidden="true"></span> Checking…' : "Get early access";
+  }
+  email.addEventListener("input", function () { if (email.getAttribute("aria-invalid") === "true") setStatus(IDLE, false); });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var problem = validate(email.value);
+    if (problem) { setStatus(problem, true); email.focus(); return; }
+    if (navigator.onLine === false) { setStatus("You appear to be offline. Check your connection and try again.", true); return; }
+    setStatus("Checking…", false);
+    setBusy(true);
+    // Brief pause so the loading state is perceivable. No network request is made.
+    setTimeout(function () {
+      setBusy(false);
+      document.getElementById("ea-echo").textContent = email.value.trim();
+      form.hidden = true;
+      result.hidden = false;
+    }, 600);
+  });
+  document.getElementById("ea-reset").addEventListener("click", function () {
+    result.hidden = true;
+    form.hidden = false;
+    form.reset();
+    setStatus(IDLE, false);
+    email.focus();
+  });
+</script>
+</body>
+</html>
